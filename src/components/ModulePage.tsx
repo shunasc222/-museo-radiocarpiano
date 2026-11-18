@@ -31,8 +31,8 @@ export default function ModulePage({ id }: { id: string }) {
               <button key={n} className="thumb" onClick={() => setLb(n)}><img loading="lazy" src={imgUrl(im.file)} alt={im.cap} /><span>{im.cap}</span><small>{SRC_NAME[im.src]}</small></button>) })}</div></section>
         </>)}
       <nav className="pager">
-        {prev ? <a href={`#/m/${prev.id}`}>← {prev.titulo}</a> : <span />}
-        {next ? <a href={`#/m/${next.id}`}>{next.titulo} →</a> : <span />}
+        {prev ? <a href={`#m-${prev.id}`}>← {prev.titulo}</a> : <span />}
+        {next ? <a href={`#m-${next.id}`}>{next.titulo} →</a> : <span />}
       </nav>
       <footer className="biblio"><b>Bibliografía de referencia</b><ul>{BIBLIO.map(b => <li key={b}>{b}</li>)}</ul>
         <p>Contenido de síntesis docente; no sustituye la lectura del texto. Las figuras provienen de los libros indicados bajo cada imagen. Material de uso académico privado.</p></footer>

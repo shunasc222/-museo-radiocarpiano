@@ -5,8 +5,8 @@ import * as THREE from 'three'
 
 export type ViewKey = 'palmar' | 'dorsal' | 'radial' | 'ulnar' | 'proximal' | 'distal'
 export const VIEW_POS: Record<ViewKey, [number, number, number]> = {
-  palmar: [0, -0.6, 10], dorsal: [0, -0.6, -10], radial: [-10, -0.6, 0.01], ulnar: [10, -0.6, 0.01],
-  proximal: [0.01, 11, 0.8], distal: [0.01, -11, 0.8]
+  palmar: [0, -0.6, 15], dorsal: [0, -0.6, -15], radial: [-15, -0.6, 0.01], ulnar: [15, -0.6, 0.01],
+  proximal: [0.01, 16, 1], distal: [0.01, -16, 1]
 }
 export type Motion = 'neutro' | 'flexion' | 'extension' | 'radial' | 'ulnar'
 
@@ -102,7 +102,7 @@ function Scene({ selected, onSelect, explode, motion, focus, hover, setHover }: 
       onPointerOut={() => { setHover(null); document.body.style.cursor = '' }}>
       <meshStandardMaterial color={selected === p.mesh ? '#e4c27c' : color(p)} roughness={0.55} metalness={0.05}
         emissive={selected === p.mesh ? '#c5a774' : hover === p.mesh ? '#4a3d22' : '#000'} emissiveIntensity={selected === p.mesh ? 0.55 : 0.5}
-        transparent opacity={p.sel === false ? 0.35 : focus && selected && selected !== p.mesh ? 0.22 : p.mesh === 'disco' ? 0.8 : 1} />
+        transparent opacity={p.sel === false ? 0.35 : focus && selected && selected !== p.mesh ? 0.3 : p.mesh === 'disco' ? 0.8 : 1} />
     </mesh>))
   return (
     <>
@@ -128,7 +128,7 @@ export default function Wrist3D(props: {
       <directionalLight position={[0, -6, 4]} intensity={0.5} color="#c5a774" />
       <Scene selected={props.selected} onSelect={props.onSelect} explode={props.explode ?? 0} motion={props.motion ?? 'neutro'}
         focus={props.focus ?? false} hover={hover} setHover={setHover} />
-      <OrbitControls ref={ctl} enablePan={false} enableZoom={props.zoom ?? true} autoRotate={props.autoRotate} autoRotateSpeed={0.6} enableDamping dampingFactor={0.1} minDistance={4} maxDistance={18} target={[0, -0.8, 0]} />
+      <OrbitControls ref={ctl} enablePan={false} enableZoom={props.zoom ?? true} autoRotate={props.autoRotate} autoRotateSpeed={0.6} enableDamping dampingFactor={0.1} minDistance={5} maxDistance={26} target={[0, -0.8, 0]} />
       <CamRig view={props.view} nonce={props.nonce + (props.resetKey ?? 0)} ctl={ctl} />
     </Canvas>
   )

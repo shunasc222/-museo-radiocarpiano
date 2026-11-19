@@ -33,7 +33,7 @@ function fadeMaterial(color: string, fade: boolean) {
 }
 type Part = { geo: THREE.BufferGeometry; center: THREE.Vector3; size: THREE.Vector3 }
 
-function Model(p: { selected: string | null; onSelect: (id: string | null) => void; layers: LayerState; showHand: boolean; explode: number; motion: Motion; focus: boolean; onAnchor?: (a: Anchor | null) => void }) {
+function Model(p: { centerRef?: React.MutableRefObject<THREE.Vector3 | null>; selected: string | null; onSelect: (id: string | null) => void; layers: LayerState; showHand: boolean; explode: number; motion: Motion; focus: boolean; onAnchor?: (a: Anchor | null) => void }) {
   const gltfs = useGLTF(URLS) as any[]
   const { camera, size } = useThree()
   const g1 = useRef<THREE.Group>(null), g2 = useRef<THREE.Group>(null), ring = useRef<THREE.Mesh>(null)
@@ -107,7 +107,7 @@ function Model(p: { selected: string | null; onSelect: (id: string | null) => vo
     const dm = refs.current['disco']; if (dm) { const L = s.layers.tfcc; dm.visible = L.on; discMat.opacity = s.selected === 'disco' ? 1 : s.selected && s.focus ? 0.12 : L.op * 0.75; if (s.selected === 'disco') selMesh = dm }
     if (selMesh && ring.current) {
       const box = new THREE.Box3().setFromObject(selMesh); const c = box.getCenter(new THREE.Vector3()), sz = box.getSize(new THREE.Vector3())
-      ring.current.visible = true; ring.current.position.copy(c); ring.current.quaternion.copy(camera.quaternion)
+      if (s.centerRef) s.centerRef.current = c.clone(); ring.current.visible = true; ring.current.position.copy(c); ring.current.quaternion.copy(camera.quaternion)
       const k = (performance.now() - t0.current) / 900
       ring.current.scale.setScalar(Math.min(6, Math.max(sz.x, sz.y, sz.z)) * (0.7 + Math.min(k, 1) * 0.9))
       ;(ring.current.material as THREE.MeshBasicMaterial).opacity = k < 1 ? 0.9 * (1 - k) : 0
@@ -115,6 +115,7 @@ function Model(p: { selected: string | null; onSelect: (id: string | null) => vo
       if (Math.abs(x - last.current.x) > 1 || Math.abs(y - last.current.y) > 1) { last.current = { x, y }; s.onAnchor?.({ x, y, w: size.width, h: size.height }) }
     } else {
       if (ring.current) ring.current.visible = false
+      if (s.centerRef) s.centerRef.current = null
       if (last.current.x !== -1) { last.current = { x: -1, y: -1 }; s.onAnchor?.(null) }
     }
   })
@@ -151,21 +152,27 @@ function Model(p: { selected: string | null; onSelect: (id: string | null) => vo
   )
 }
 
-function CamRig({ view, nonce, frame, ctl, zoomCmd }: { view: ViewKey; nonce: number; frame: FrameMode; ctl: React.RefObject<any>; zoomCmd?: { n: number; f: number } }) {
+function CamRig({ view, nonce, frame, ctl, zoomCmd, focusCmd, centerRef }: { view: ViewKey; nonce: number; frame: FrameMode; ctl: React.RefObject<any>; zoomCmd?: { n: number; f: number }; focusCmd?: number; centerRef: React.MutableRefObject<THREE.Vector3 | null> }) {
   const { camera, size } = useThree()
   const asp = size.width / size.height
   const target = useRef<THREE.Vector3 | null>(null)
+  const look = useRef<THREE.Vector3>(FR[frame].t.clone())
   const T = FR[frame]
   const dist = T.d * Math.max(1, 1.0 / asp)
-  useEffect(() => { ctl.current?.target.copy(T.t); target.current = new THREE.Vector3(...DIRS[view]).normalize().multiplyScalar(dist).add(T.t) }, [view, nonce, dist, frame])
+  useEffect(() => { look.current = T.t.clone(); ctl.current?.target.copy(T.t); target.current = new THREE.Vector3(...DIRS[view]).normalize().multiplyScalar(dist).add(T.t) }, [view, nonce, dist, frame])
+  useEffect(() => {
+    if (!focusCmd || !centerRef.current) return
+    const c = centerRef.current.clone(); look.current = c; ctl.current?.target.copy(c)
+    target.current = camera.position.clone().sub(c).normalize().multiplyScalar(7).add(c)
+  }, [focusCmd])
   useEffect(() => {
     if (!zoomCmd || !zoomCmd.n) return
-    const rel = camera.position.clone().sub(T.t).multiplyScalar(zoomCmd.f); const l = rel.length()
-    if (l > 4 && l < 60) { camera.position.copy(rel.add(T.t)); ctl.current?.update() }
+    const rel = camera.position.clone().sub(look.current).multiplyScalar(zoomCmd.f); const l = rel.length()
+    if (l > 4 && l < 60) { camera.position.copy(rel.add(look.current)); ctl.current?.update() }
   }, [zoomCmd?.n])
   useFrame(() => {
     if (!target.current) return
-    camera.position.lerp(target.current, 0.12); camera.lookAt(T.t); ctl.current?.update()
+    camera.position.lerp(target.current, 0.12); camera.lookAt(look.current); ctl.current?.update()
     if (camera.position.distanceTo(target.current) < 0.02) target.current = null
   })
   return null
@@ -180,9 +187,10 @@ export function Loader() {
 export default function Wrist3D(props: {
   selected: string | null; onSelect: (id: string | null) => void; layers?: LayerState; showHand?: boolean; explode?: number; motion?: Motion
   focus?: boolean; view: ViewKey; nonce: number; frame?: FrameMode; autoRotate?: boolean; zoom?: boolean
-  zoomCmd?: { n: number; f: number }; onAnchor?: (a: Anchor | null) => void
+  zoomCmd?: { n: number; f: number }; onAnchor?: (a: Anchor | null) => void; focusCmd?: number
 }) {
   const ctl = useRef<any>(null)
+  const centerRef = useRef<THREE.Vector3 | null>(null)
   return (
     <>
       <Canvas camera={{ position: [0.6, 1, 17], fov: 36, near: 0.5, far: 150 }} dpr={[1, 2]} onPointerMissed={() => props.onSelect(null)} style={{ touchAction: 'none' }}>
@@ -192,12 +200,12 @@ export default function Wrist3D(props: {
         <directionalLight position={[-7, 3, -6]} intensity={1.3} color="#5fb8d8" />
         <directionalLight position={[0, -6, 5]} intensity={0.5} color="#c5a774" />
         <Suspense fallback={null}>
-          <Model selected={props.selected} onSelect={props.onSelect} layers={props.layers ?? DEFAULT_LAYERS} showHand={props.showHand ?? true}
+          <Model centerRef={centerRef} selected={props.selected} onSelect={props.onSelect} layers={props.layers ?? DEFAULT_LAYERS} showHand={props.showHand ?? true}
             explode={props.explode ?? 0} motion={props.motion ?? 'neutro'} focus={props.focus ?? false} onAnchor={props.onAnchor} />
         </Suspense>
         <OrbitControls ref={ctl} enablePan={false} enableZoom={props.zoom ?? true} autoRotate={props.autoRotate} autoRotateSpeed={0.6}
           enableDamping dampingFactor={0.1} minDistance={4} maxDistance={60} target={FR.muneca.t.toArray()} />
-        <CamRig view={props.view} nonce={props.nonce} frame={props.frame ?? 'muneca'} ctl={ctl} zoomCmd={props.zoomCmd} />
+        <CamRig view={props.view} nonce={props.nonce} frame={props.frame ?? 'muneca'} ctl={ctl} zoomCmd={props.zoomCmd} focusCmd={props.focusCmd} centerRef={centerRef} />
       </Canvas>
       <Loader />
     </>

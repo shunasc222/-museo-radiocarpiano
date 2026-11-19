@@ -56,3 +56,13 @@ Ver `README.md`.
 **Solo 2D (sin recurso 3D verificable):** cápsula, sinovial y recesos, cartílago, interlínea, todos los ligamentos radiocarpianos e intercarpianos, componentes del CFCT salvo la ubicación del disco (marcador), retináculo extensor, nervios, troncos arteriales radial/ulnar y redes carpianas.
 
 **Pendiente por falta de recursos fiables:** mallas de ligamentos, cápsula, cartílago, disco y nervios (requieren segmentación de RM/TC o atlas con licencia); revisión anatómica por un docente; prueba en dispositivos físicos, Safari y Firefox.
+
+---
+## Actualización — navegación y UX (rama `ux-navegacion`)
+- Ficha anatómica en móvil como *bottom sheet*: se abre sola al seleccionar (nombre, clasificación, terminología, definición/ubicación y función), se expande a ficha completa, se cierra deslizando hacia abajo o con «Cerrar»; la selección se conserva y un botón flotante permite reabrirla. No altera el tamaño ni la posición de la lámina. En escritorio se mantiene el panel lateral.
+- «Ampliar en 3D» (enfoque de cámara sobre la estructura) y «Ampliar en la lámina» (vista ampliada en un modal; la lámina original no se modifica), solo cuando la estructura tiene malla o punto en la lámina activa.
+- Barra de acceso rápido fija: ATLAS 2D | MODELO 3D | CAPAS (con contador) | INFORMACIÓN.
+- Botón «Capas anatómicas» (con contador) sobre el visor 3D: abre un panel flotante (hoja inferior en móvil) con los mismos controles de mostrar/ocultar, transparencia, presets, fichas y láminas; se retiró la sección fija inferior sin eliminar ninguna capa ni función.
+- Guía de 5 pasos descartable (se recuerda en el navegador) e indicaciones contextuales breves.
+- Sin cambios en mallas, contenido científico, imágenes, colores ni tipografía.
+- Verificado en Chromium (390 px, táctil): selección 2D y 3D, apertura/expansión/cierre y deslizamiento de la ficha, reapertura, modal de ampliación, ampliar en 3D, panel de capas (activación y contador), sin desbordamiento horizontal; escritorio con ficha lateral. Sin errores de consola. No probado en dispositivos físicos.

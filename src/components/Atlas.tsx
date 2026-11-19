@@ -21,16 +21,20 @@ export function ImageViewer({ view, selected, onPick }: { view: View; selected: 
 
 export function Ficha({ id, onClose }: { id: string | null; onClose?: () => void }) {
   const s = id ? STRUCTURES[id] : null
-  if (!s) return <div className="ficha empty"><p className="eyebrow">Análisis anatómico</p><p>Seleccione una estructura en el atlas o en el modelo 3D para identificarla.</p></div>
+  if (!s) return <div className="ficha empty"><p className="eyebrow">Análisis anatómico</p><p>Seleccione una estructura en el atlas, en el modelo 3D o en el panel de capas para identificarla.</p></div>
   const rows: [string, string | undefined][] = [
-    ['Localización', s.ubicacion], ['Relaciones anatómicas', s.relaciones], ['Función', s.funcion],
-    ['Importancia biomecánica', s.biomecanica], ['Correlación clínica', s.clinica],
-    ['Descripción morfológica', s.morfologia], ['Inserciones', s.inserciones]]
+    ['Definición', s.definicion], ['Ubicación', s.ubicacion], ['Morfología', s.morfologia], ['Superficies articulares', s.superficies],
+    ['Relaciones anatómicas', s.relaciones], ['Origen e inserción', s.inserciones], ['Función', s.funcion], ['Participación biomecánica', s.biomecanica],
+    ['Vascularización e inervación', s.vascinerv], ['Importancia clínica', s.clinica]]
+  const shown = rows.filter(r => r[1])
   return (
     <div className="ficha live" key={s.id}>
-      <div className="fhead"><div><p className="eyebrow cyan">Análisis anatómico · estructura identificada</p><h3>{s.nombre}</h3><span className="tag">{s.tipo}</span></div>{onClose && <button className="x" onClick={onClose} aria-label="Cerrar">×</button>}</div>
-      {rows.filter(r => r[1]).map(([k, v], i) => (
-        <details key={k} open={i < 3}><summary>{k}</summary><p>{v}</p></details>))}
+      <div className="fhead"><div><p className="eyebrow cyan">Análisis anatómico · estructura identificada</p><h3>{s.nombre}</h3>
+        <span className="tag">{s.tipo}</span>{s.disp && <span className={'tag disp d' + s.disp.replace(/\W/g, '')}>{s.disp}</span>}</div>{onClose && <button className="x" onClick={onClose} aria-label="Cerrar">×</button>}</div>
+      {(s.term || s.trad) && <p className="term">{s.term}{s.term && s.trad ? ' · ' : ''}{s.trad}</p>}
+      {shown.map(([k, v], i) => <details key={k} open={i < 3}><summary>{k}</summary><p>{v}</p></details>)}
+      {s.limitaciones && <details open><summary>Disponibilidad y limitaciones</summary><p className="lim">{s.limitaciones}</p></details>}
+      {s.fuente && <details><summary>Fuente bibliográfica</summary><p>{s.fuente}</p></details>}
     </div>
   )
 }

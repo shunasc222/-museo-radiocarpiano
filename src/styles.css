@@ -164,3 +164,35 @@ html{scroll-padding-top:84px}.modsec,#modulos{scroll-margin-top:84px}
 html,body{max-width:100vw}
 .credits{max-width:1500px;margin:0 auto;padding:1.5rem clamp(16px,4vw,56px) 3rem;border-top:1px solid var(--line);font-size:.72rem;color:var(--mut);line-height:1.6}
 @media(max-width:760px){.credits{padding-bottom:5rem}}
+
+/* ===== Laboratorio con capas ===== */
+.labgrid{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 380px;grid-template-rows:auto 1fr}
+.pane.atlas{grid-column:1;grid-row:1/3}.labgrid>.pane:nth-child(2){grid-column:2;grid-row:1/3}
+.layers{grid-column:3;grid-row:1;min-width:0}.side{grid-column:3;grid-row:2}
+.layers{background:var(--glass);border:1px solid rgba(127,227,255,.2);backdrop-filter:blur(12px);align-self:start}
+.lhead{display:flex;justify-content:space-between;align-items:center;width:100%;padding:.85rem 1rem;background:none;border:none;text-align:left;border-bottom:1px solid var(--line)}
+.lhead i{font-style:normal;display:block;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--cy)}.lhead small{color:var(--mut);font-size:.72rem}.lhead em{font-style:normal;font-size:.72rem;color:var(--gold)}
+.lbody{padding:.6rem .8rem 1rem;display:grid;gap:.35rem;max-height:56vh;overflow:auto}
+.lpresets{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.4rem}
+.chip.sm{padding:.25rem .65rem;font-size:.72rem;min-height:32px;text-align:left}
+.lrow{border-top:1px solid var(--line);padding:.4rem 0}.lrow.act{background:#7fe3ff08}
+.lline{display:flex;gap:.7rem;align-items:center}
+.ltitle{background:none;border:none;text-align:left;display:flex;flex-wrap:wrap;gap:.15rem .6rem;align-items:center;min-height:40px;padding:0;flex:1}.ltitle span{font-size:.9rem;color:var(--txt)}
+.bd{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;padding:.1rem .5rem;border-radius:999px;border:1px solid var(--line);color:var(--mut)}
+.b3D{color:var(--cy);border-color:rgba(127,227,255,.45)}.b3Dparcial{color:#9fe0c8;border-color:#9fe0c855}.b2D{color:var(--gold);border-color:#c5a77455}.b2Dmarcador{color:#c9b4f0;border-color:#c9b4f055}
+.sw{position:relative;width:44px;height:26px;flex:none}.sw input{position:absolute;inset:0;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:2}
+.sw i{position:absolute;inset:0;border-radius:99px;background:#1a2a3a;border:1px solid var(--line);transition:.2s}.sw i::after{content:'';position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:var(--mut);transition:.2s}
+.sw input:checked+i{background:#0f4a60;border-color:var(--cy)}.sw input:checked+i::after{left:21px;background:var(--cy)}
+.sw.off{display:grid;place-items:center;font-size:.6rem;letter-spacing:.1em;color:var(--gold);border:1px dashed #c5a77466;border-radius:99px}
+.lopen{padding:.2rem 0 .5rem 0;display:grid;gap:.5rem}.lnote{font-size:.78rem;color:var(--mut);line-height:1.5}
+.lbl.op{display:grid;gap:.2rem}.lbl.op input{width:100%}.chk{font-size:.82rem;display:flex;gap:.5rem;align-items:center;min-height:36px}.chk input{accent-color:var(--cy);width:18px;height:18px}
+.chips{display:flex;flex-wrap:wrap;gap:.35rem}
+.plates{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.4rem}
+.pthumb{background:#07111d;border:1px solid var(--line);border-radius:6px;padding:.35rem .5rem;font-size:.68rem;text-align:left;line-height:1.3;color:var(--mut);min-height:44px}.pthumb.on{border-color:var(--cy);color:var(--txt)}
+.readout{font-size:.78rem;color:var(--cy);margin-top:.2rem}.readout span{color:var(--mut)}
+.term{font-family:var(--serif);font-style:italic;color:var(--gold2);margin:.5rem 0}
+.tag.disp{margin-left:.35rem;color:var(--gold);border-color:#c5a77455}.tag.d3Dreal{color:var(--cy)}.tag.d3Dderivado{color:#9fe0c8;border-color:#9fe0c855}.tag.d3Desquemtico{color:#c9b4f0;border-color:#c9b4f055}
+.lim{color:#d9c8a2}
+@media(max-width:1100px){.labgrid{grid-template-columns:1fr 1fr;grid-template-rows:auto}.pane.atlas,.labgrid>.pane:nth-child(2){grid-row:auto;grid-column:auto}.layers{grid-column:1/-1;grid-row:auto}.side{grid-column:1/-1;grid-row:auto}}
+@media(max-width:760px){.labgrid{grid-template-columns:1fr}.layers,.side{grid-column:auto}.lbody{max-height:none}.plates{grid-template-columns:1fr 1fr}.lhead{min-height:52px}}
+.tag.d3Desquemtico,.tag.d3Desquemático{color:#c9b4f0}

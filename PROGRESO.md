@@ -38,3 +38,21 @@ Ver `README.md`.
 - Móvil: header sin tapar contenido (scroll-padding), pestañas con salto de línea en vez de recorte, botones ≥40 px, ficha inferior colapsable, sin desbordamiento horizontal (verificado a 360 px en las 12 pantallas).
 - Verificado (Chromium headless, emulación táctil): compilación OK; 64/64 imágenes; sin errores de consola; toque en el 3D selecciona hueso y abre la ficha; orientaciones y zoom ejecutan sin error; el simulador y la evaluación cargan. No probado en dispositivos físicos ni Safari/Firefox.
 - Pendiente: mallas de mayor resolución; metacarpianos; verificar el contenido de las fichas con el texto de referencia; revisar visualmente cada orientación en dispositivo real.
+
+
+---
+## Actualización — capas anatómicas (rama `capas-anatomicas`)
+**Completado (verificado en Chromium headless, sin errores de consola):**
+- Mano completa en 3D: 5 metacarpianos y 14 falanges (BodyParts3D, `public/models/mano.glb`), articulados con el carpo; interruptor «Mano completa» y encuadre «Muñeca / Mano completa».
+- **Sistema de capas** (8 capas) con mostrar/ocultar, transparencia, selección, ficha y restablecer. Cada interruptor actúa sobre mallas reales (`public/models/capas.glb`). Las capas solo 2D no tienen interruptor: muestran su insignia «2D», fichas y láminas del atlas.
+- 3D real adicional: 15 músculos/tendones, retináculo flexor, membrana interósea, 5 arterias parciales.
+- 3D derivado (aproximación): carillas escafoidea/semilunar del radio y superficies proximales de escafoides y semilunar, por proximidad entre mallas.
+- Disco articular: **solo marcador esquemático** de alambre.
+- Biomecánica: jerarquía radiocarpiana/mediocarpiana (dos pivotes) con lectura de grados; reparto ilustrativo. Sin pronosupinación.
+- «Exploración por separación» implementada (huesos y zonas derivadas; los tejidos blandos permanecen).
+- Fichas ampliadas (terminología, definición, origen/inserción, vascularización e inervación, clínica, fuente, limitaciones) y ~60 estructuras nuevas; 3 láminas atlas nuevas con puntos (articulación abierta, vista posterior abierta, corte coronal ampliado).
+- Registro por estructura en `COBERTURA.md`.
+
+**Solo 2D (sin recurso 3D verificable):** cápsula, sinovial y recesos, cartílago, interlínea, todos los ligamentos radiocarpianos e intercarpianos, componentes del CFCT salvo la ubicación del disco (marcador), retináculo extensor, nervios, troncos arteriales radial/ulnar y redes carpianas.
+
+**Pendiente por falta de recursos fiables:** mallas de ligamentos, cápsula, cartílago, disco y nervios (requieren segmentación de RM/TC o atlas con licencia); revisión anatómica por un docente; prueba en dispositivos físicos, Safari y Firefox.

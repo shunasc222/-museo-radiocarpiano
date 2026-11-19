@@ -40,7 +40,7 @@ export default function Quiz() {
       {it.kind === 'id' ? (
         <>
           <h3>Seleccione en el modelo: <em>{STRUCTURES[it.target].nombre.replace(/ \(.*\)/, '')}</em></h3>
-          <div className="viewer3d small"><Wrist3D selected={pickedId} view="palmar" nonce={0}
+          <div className="viewer3d small"><Wrist3D selected={pickedId} view="palmar" nonce={0} showHand={false}
             onSelect={id => { if (!id || answered) return; setPickedId(id); record(id, id === it.target) }} /></div>
           {answered && <p className={'fb ' + (mark[step] ? 'ok' : 'bad')}>{mark[step] ? 'Correcto. ' : `Incorrecto: seleccionó ${STRUCTURES[ans[step] as string]?.nombre ?? 'otra estructura'}. `}{STRUCTURES[it.target].ubicacion}</p>}
         </>

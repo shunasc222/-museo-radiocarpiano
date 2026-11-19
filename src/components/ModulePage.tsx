@@ -22,7 +22,7 @@ export default function ModulePage({ id }: { id: string }) {
             <section key={s.h} className="sec"><h2>{s.h}</h2>{s.p && <p>{s.p}</p>}{s.li && <ul>{s.li.map(l => <li key={l}>{l}</li>)}</ul>}</section>))}</div>
           {m.id === 'biomecanica' && (
             <section className="block"><h2>Simulador esquemático</h2>
-              <div className="viewer3d small"><Wrist3D selected={null} onSelect={() => {}} view="palmar" nonce={0} motion={mo} /></div>
+              <div className="viewer3d small"><Wrist3D selected={null} onSelect={() => {}} view="palmar" nonce={0} motion={mo} frame="mano" /></div>
               <div className="tabs">{([['neutro', 'Neutro'], ['flexion', 'Flexión'], ['extension', 'Extensión'], ['radial', 'Desv. radial'], ['ulnar', 'Desv. ulnar']] as [Motion, string][]).map(([k, n]) => <button key={k} className={mo === k ? 'on' : ''} onClick={() => setMo(k)}>{n}</button>)}</div>
               <p className="disclaimer">Animación didáctica del bloque carpiano sobre el antebrazo; las amplitudes son ilustrativas.</p></section>)}
           {ATLAS[m.id] && <AtlasBlock ns={ATLAS[m.id]} />}

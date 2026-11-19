@@ -14,4 +14,4 @@ con *Build command* `npm run build` y *Output directory* `dist`. Mantén el acce
 Ver `PROGRESO.md` para alcance y limitaciones.
 
 ## Créditos del modelo 3D
-Huesos: BodyParts3D © DBCLS, CC BY-SA 2.1 JP (https://lifesciencedb.jp/bp3d/). Mallas redistribuidas con modificaciones (`tools/build_glb.py`); el archivo `public/models/muneca_bodyparts3d.glb` hereda la licencia CC BY-SA 2.1 JP.
+Huesos: BodyParts3D © DBCLS, CC BY-SA 2.1 JP (https://lifesciencedb.jp/bp3d/). Mallas redistribuidas con modificaciones (`tools/build_glb.py`); los archivos `public/models/*.glb` (muneca_bodyparts3d, mano, capas) heredan la licencia CC BY-SA 2.1 JP.

@@ -1,7 +1,9 @@
+export type Disp = '3D real' | '3D derivado' | '3D esquemático' | '2D'
 export interface Structure {
-  id: string; nombre: string; tipo: 'Hueso' | 'Ligamento' | 'Articulación' | 'Fibrocartílago'
-  ubicacion: string; morfologia: string; relaciones: string; inserciones?: string
-  funcion: string; biomecanica: string; clinica: string
+  id: string; nombre: string; tipo: string
+  capa?: string; disp?: Disp; term?: string; trad?: string; definicion?: string
+  ubicacion?: string; morfologia?: string; superficies?: string; relaciones?: string; inserciones?: string
+  funcion?: string; biomecanica?: string; vascinerv?: string; clinica?: string; fuente?: string; limitaciones?: string
 }
 
 export const STRUCTURES: Record<string, Structure> = {
@@ -215,8 +217,19 @@ export interface View { n: number; titulo: string; hotspots: Hotspot[] }
 export const LAB_VIEWS: View[] = [
   { n: 14, titulo: 'Corte coronal', hotspots: [
     { id: 'ulna', x: 38, y: 10, label: 'Ulna' }, { id: 'radio', x: 57, y: 13, label: 'Radio' },
-    { id: 'disco', x: 38, y: 29, label: 'Disco articular' }, { id: 'escafoides', x: 58, y: 45, label: 'Escafoides' },
+    { id: 'sinovial', x: 44, y: 17, label: 'Sinovial radioulnar distal' }, { id: 'estiloides_ulnar', x: 34, y: 25, label: 'Proceso estiloides de la ulna' },
+    { id: 'disco', x: 38, y: 29, label: 'Disco articular' }, { id: 'estiloides_radial', x: 63, y: 33, label: 'Proceso estiloides del radio' },
+    { id: 'interlinea', x: 60, y: 40, label: 'Interlínea radiocarpiana' }, { id: 'escafoides', x: 58, y: 45, label: 'Escafoides' },
     { id: 'piramidal', x: 33, y: 45, label: 'Piramidal' }, { id: 'trapecio', x: 64, y: 56, label: 'Trapecio' } ] },
+  { n: 13, titulo: 'Articulación abierta', hotspots: [
+    { id: 'carilla_escafoidea', x: 42, y: 45, label: 'Superficie lateral de la carilla articular del radio' }, { id: 'carilla_semilunar', x: 50, y: 47, label: 'Superficie medial de la carilla articular del radio' },
+    { id: 'disco', x: 58, y: 46, label: 'Disco articular' }, { id: 'pliegue_sinovial', x: 36, y: 58, label: 'Pliegue sinovial posterior' },
+    { id: 'capsula', x: 36, y: 65, label: 'Cápsula articular' }, { id: 'receso_preestiloideo', x: 61, y: 56, label: 'Receso preestiloideo' },
+    { id: 'escafoides', x: 38, y: 76, label: 'Escafoides' }, { id: 'semilunar', x: 50, y: 79, label: 'Semilunar' },
+    { id: 'piramidal', x: 58, y: 76, label: 'Piramidal' }, { id: 'pliegue_sinovial', x: 47, y: 86, label: 'Pliegue sinovial anterior' } ] },
+  { n: 15, titulo: 'Vista posterior abierta', hotspots: [
+    { id: 'capsula', x: 60, y: 30, label: 'Cápsula' }, { id: 'semilunar', x: 53, y: 45, label: 'Semilunar' },
+    { id: 'piramidal', x: 38, y: 52, label: 'Piramidal' }, { id: 'escafoides', x: 70, y: 58, label: 'Escafoides' } ] },
   { n: 19, titulo: 'Ligamentos palmares', hotspots: [
     { id: 'radio', x: 45, y: 17, label: 'Radio' }, { id: 'ulna', x: 62, y: 17, label: 'Ulna' },
     { id: 'membrana', x: 58, y: 22, label: 'Membrana interósea' }, { id: 'lrudistal', x: 56, y: 32, label: 'Lig. radioulnar distal anterior' },

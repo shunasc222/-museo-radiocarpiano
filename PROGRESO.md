@@ -27,3 +27,14 @@
 
 ## Publicación
 Ver `README.md`.
+
+
+---
+## Actualización — modelo 3D real e interfaz de análisis (rama `futurista-3d-real`)
+- **Modelo 3D reemplazado** por mallas reales de **BodyParts3D** (DBCLS, CC BY-SA 2.1 JP), obtenidas del repositorio público `olivercase/body_parts_3d_api`: radio, ulna, escafoides, semilunar, piramidal, pisiforme, trapecio, trapezoide, hueso grande y ganchoso (mano derecha, mismo sistema de coordenadas, por lo que sus posiciones relativas son las de la malla).
+- Procesado reproducible en `tools/build_glb.py`: recorte de ~7,5 cm de radio y ulna, subdivisión lineal + suavizado Taubin, exportación a `public/models/muneca_bodyparts3d.glb` (~250 KB). Atribución visible en la aplicación.
+- **Limitaciones honestas:** la malla de origen es de baja resolución (las superficies articulares finas no son exactas) y corresponde a un solo individuo de referencia. Las mallas tienen pequeñas aberturas (se renderizan a doble cara). El **disco articular es una figura esquemática** (BodyParts3D no lo incluye). No hay cartílago, ligamentos, tendones ni metacarpianos. Los movimientos del simulador son rotaciones rígidas ilustrativas alrededor de la cabeza del hueso grande.
+- Interfaz: selección con contorno cian y resto atenuado, anillo de «análisis», rótulos («Visualización radiocarpiana», «Estructura identificada», «Análisis anatómico»), llamada flotante con conector hacia la estructura, ficha translúcida reordenada (localización, relaciones, función, biomecánica, clínica, morfología, inserciones), hotspots 2D con realce cian.
+- Móvil: header sin tapar contenido (scroll-padding), pestañas con salto de línea en vez de recorte, botones ≥40 px, ficha inferior colapsable, sin desbordamiento horizontal (verificado a 360 px en las 12 pantallas).
+- Verificado (Chromium headless, emulación táctil): compilación OK; 64/64 imágenes; sin errores de consola; toque en el 3D selecciona hueso y abre la ficha; orientaciones y zoom ejecutan sin error; el simulador y la evaluación cargan. No probado en dispositivos físicos ni Safari/Firefox.
+- Pendiente: mallas de mayor resolución; metacarpianos; verificar el contenido de las fichas con el texto de referencia; revisar visualmente cada orientación en dispositivo real.

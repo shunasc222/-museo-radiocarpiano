@@ -12,3 +12,6 @@ con *Build command* `npm run build` y *Output directory* `dist`. Mantén el acce
 **GitHub Pages:** `.github/workflows/pages.yml` publica `dist`; en repos privados Pages exige un plan de pago. Activar en Settings → Pages → Source: GitHub Actions y ejecutar el flujo desde la rama que prefieras (el flujo se activa con `main`).
 
 Ver `PROGRESO.md` para alcance y limitaciones.
+
+## Créditos del modelo 3D
+Huesos: BodyParts3D © DBCLS, CC BY-SA 2.1 JP (https://lifesciencedb.jp/bp3d/). Mallas redistribuidas con modificaciones (`tools/build_glb.py`); el archivo `public/models/muneca_bodyparts3d.glb` hereda la licencia CC BY-SA 2.1 JP.

@@ -7,7 +7,7 @@ export function ImageViewer({ view, selected, onPick }: { view: View; selected: 
   const im = byN(view.n)
   return (
     <figure className="frame">
-      <div className="imgwrap">
+      <div className={"imgwrap" + (selected && view.hotspots.some(h => h.id === selected) ? " hasSel" : "")}>
         <img src={imgUrl(im.file)} alt={im.cap} draggable={false} />
         {view.hotspots.map(h => (
           <button key={h.id + h.x} className={'hot' + (selected === h.id ? ' on' : '')} style={{ left: h.x + '%', top: h.y + '%' }}
@@ -21,15 +21,16 @@ export function ImageViewer({ view, selected, onPick }: { view: View; selected: 
 
 export function Ficha({ id, onClose }: { id: string | null; onClose?: () => void }) {
   const s = id ? STRUCTURES[id] : null
-  if (!s) return <div className="ficha empty"><p className="eyebrow">Ficha anatómica</p><p>Seleccione una estructura en el atlas o en el modelo 3D.</p></div>
+  if (!s) return <div className="ficha empty"><p className="eyebrow">Análisis anatómico</p><p>Seleccione una estructura en el atlas o en el modelo 3D para identificarla.</p></div>
   const rows: [string, string | undefined][] = [
-    ['Ubicación', s.ubicacion], ['Descripción morfológica', s.morfologia], ['Relaciones', s.relaciones], ['Inserciones', s.inserciones],
-    ['Función', s.funcion], ['Importancia biomecánica', s.biomecanica], ['Correlación clínica', s.clinica]]
+    ['Localización', s.ubicacion], ['Relaciones anatómicas', s.relaciones], ['Función', s.funcion],
+    ['Importancia biomecánica', s.biomecanica], ['Correlación clínica', s.clinica],
+    ['Descripción morfológica', s.morfologia], ['Inserciones', s.inserciones]]
   return (
-    <div className="ficha">
-      <div className="fhead"><div><p className="eyebrow">{s.tipo}</p><h3>{s.nombre}</h3></div>{onClose && <button className="x" onClick={onClose} aria-label="Cerrar">×</button>}</div>
+    <div className="ficha live" key={s.id}>
+      <div className="fhead"><div><p className="eyebrow cyan">Análisis anatómico · estructura identificada</p><h3>{s.nombre}</h3><span className="tag">{s.tipo}</span></div>{onClose && <button className="x" onClick={onClose} aria-label="Cerrar">×</button>}</div>
       {rows.filter(r => r[1]).map(([k, v], i) => (
-        <details key={k} open={i < 2}><summary>{k}</summary><p>{v}</p></details>))}
+        <details key={k} open={i < 3}><summary>{k}</summary><p>{v}</p></details>))}
     </div>
   )
 }

@@ -1,136 +1,201 @@
-import { useMemo, useRef, useState, useEffect } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
+import { OrbitControls, Outlines, useGLTF, useProgress } from '@react-three/drei'
 import * as THREE from 'three'
 
 export type ViewKey = 'palmar' | 'dorsal' | 'radial' | 'ulnar' | 'proximal' | 'distal'
-export const VIEW_POS: Record<ViewKey, [number, number, number]> = {
-  palmar: [0, -0.6, 15], dorsal: [0, -0.6, -15], radial: [-15, -0.6, 0.01], ulnar: [15, -0.6, 0.01],
-  proximal: [0.01, 16, 1], distal: [0.01, -16, 1]
-}
 export type Motion = 'neutro' | 'flexion' | 'extension' | 'radial' | 'ulnar'
+export interface Anchor { x: number; y: number; w: number; h: number }
 
-interface Part { mesh: string; pos: [number, number, number]; r: [number, number, number]; rot?: [number, number, number]; seed: number; group: 'fore' | 'hand'; sel?: boolean }
+// Malla: BodyParts3D (DBCLS), CC BY-SA 2.1 JP — huesos derechos radio, ulna y 8 carpianos,
+// recortados (~7,5 cm proximales de radio y ulna), subdivididos y suavizados. Escala 1 u = 1 cm.
+const URL_GLB = `${import.meta.env.BASE_URL}models/muneca_bodyparts3d.glb`
+const TARGET = new THREE.Vector3(0.6, 2.6, 0)
+const DIRS: Record<ViewKey, [number, number, number]> = {
+  palmar: [0, 0, 1], dorsal: [0, 0, -1], radial: [-1, 0, 0], ulnar: [1, 0, 0], proximal: [0, 1, 0.08], distal: [0, -1, 0.08]
+}
+const DIST = 15
+const HAND = ['escafoides', 'semilunar', 'piramidal', 'pisiforme', 'trapecio', 'trapezoide', 'grande', 'ganchoso']
+const FORE = ['radio', 'ulna']
+const ALL = [...FORE, ...HAND]
+const CYAN = '#7fe3ff'
 
-// Geometría DIDÁCTICA: elipsoides deformadas ubicadas con relaciones espaciales
-// aproximadas. No es una reconstrucción anatómica exacta ni procede de una malla escaneada.
-const PARTS: Part[] = [
-  { mesh: 'radio', pos: [-0.95, 2.2, 0], r: [0.55, 1.9, 0.42], seed: 1, group: 'fore' },
-  { mesh: 'radio', pos: [-0.95, 0.35, 0], r: [1.05, 0.55, 0.62], seed: 2, group: 'fore' },
-  { mesh: 'radio', pos: [-1.75, 0.0, 0], r: [0.28, 0.42, 0.28], rot: [0, 0, 0.35], seed: 3, group: 'fore' },
-  { mesh: 'radio', pos: [-0.95, 0.5, -0.58], r: [0.16, 0.3, 0.16], seed: 4, group: 'fore' },
-  { mesh: 'ulna', pos: [1.0, 2.4, -0.05], r: [0.38, 2.0, 0.38], seed: 5, group: 'fore' },
-  { mesh: 'ulna', pos: [1.0, 0.7, -0.05], r: [0.5, 0.42, 0.5], seed: 6, group: 'fore' },
-  { mesh: 'ulna', pos: [1.45, 0.42, -0.15], r: [0.17, 0.3, 0.17], rot: [0, 0, -0.25], seed: 7, group: 'fore' },
-  { mesh: 'disco', pos: [0.72, 0.13, 0], r: [0.7, 0.07, 0.55], seed: 8, group: 'fore' },
-  { mesh: 'escafoides', pos: [-1.0, -0.62, 0.22], r: [0.64, 0.34, 0.36], rot: [0, 0, 0.6], seed: 9, group: 'hand' },
-  { mesh: 'semilunar', pos: [-0.05, -0.62, 0], r: [0.5, 0.4, 0.4], seed: 10, group: 'hand' },
-  { mesh: 'piramidal', pos: [0.92, -0.72, -0.05], r: [0.45, 0.38, 0.38], seed: 11, group: 'hand' },
-  { mesh: 'pisiforme', pos: [1.18, -0.9, 0.5], r: [0.22, 0.22, 0.22], seed: 12, group: 'hand' },
-  { mesh: 'trapecio', pos: [-1.6, -1.72, 0.2], r: [0.42, 0.42, 0.42], seed: 13, group: 'hand' },
-  { mesh: 'trapezoide', pos: [-0.9, -1.85, 0], r: [0.32, 0.36, 0.33], seed: 14, group: 'hand' },
-  { mesh: 'grande', pos: [-0.05, -1.68, 0], r: [0.42, 0.64, 0.42], seed: 15, group: 'hand' },
-  { mesh: 'ganchoso', pos: [0.92, -1.82, 0], r: [0.45, 0.45, 0.4], seed: 16, group: 'hand' },
-  { mesh: 'ganchoso', pos: [0.92, -1.9, 0.45], r: [0.12, 0.22, 0.14], seed: 17, group: 'hand' },
-  ...[-1.95, -0.95, -0.05, 0.9, 1.6].map((x, i): Part => ({ mesh: 'meta' + i, pos: [x, -3.6, 0], r: [0.24, 1.2, 0.24], seed: 20 + i, group: 'hand', sel: false }))
-]
-
-const CENTER = new THREE.Vector3(0, -0.8, 0)
-const PIVOT = new THREE.Vector3(-0.05, -1.3, 0)
-
-function blob(r: [number, number, number], seed: number) {
-  const g = new THREE.IcosahedronGeometry(1, 4)
-  const p = g.attributes.position
-  const v = new THREE.Vector3()
-  for (let i = 0; i < p.count; i++) {
-    v.fromBufferAttribute(p, i)
-    const n = Math.sin(v.x * 3.1 + seed) * Math.cos(v.y * 2.7 + seed * 1.3) * Math.sin(v.z * 3.3 + seed * 0.7)
-    const k = 1 + 0.07 * n
-    p.setXYZ(i, v.x * r[0] * k, v.y * r[1] * k, v.z * r[2] * k)
+function fadeMaterial(color: string) {
+  const m = new THREE.MeshStandardMaterial({ color, roughness: 0.62, metalness: 0.02, transparent: true, side: THREE.DoubleSide })
+  m.onBeforeCompile = sh => {
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying float vPy;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvPy = position.y;')
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying float vPy;').replace('#include <dithering_fragment>', '#include <dithering_fragment>\ngl_FragColor.a *= 1.0 - smoothstep(5.0, 7.6, vPy);')
   }
-  g.computeVertexNormals()
-  return g
+  return m
+}
+
+function Model(p: { selected: string | null; onSelect: (id: string | null) => void; explode: number; motion: Motion; focus: boolean; onAnchor?: (a: Anchor | null) => void }) {
+  const gltf = useGLTF(URL_GLB)
+  const { camera, size } = useThree()
+  const hand = useRef<THREE.Group>(null)
+  const ring = useRef<THREE.Mesh>(null)
+  const ang = useRef({ x: 0, z: 0 })
+  const [hover, setHover] = useState<string | null>(null)
+  const last = useRef({ x: -1, y: -1 })
+  const t0 = useRef(0)
+
+  const parts = useMemo(() => {
+    const out: Record<string, { geo: THREE.BufferGeometry; center: THREE.Vector3; size: THREE.Vector3 }> = {}
+    gltf.scene.traverse(o => {
+      const m = o as THREE.Mesh
+      if (m.isMesh && ALL.includes(m.name)) {
+        const g = m.geometry as THREE.BufferGeometry
+        g.computeBoundingBox()
+        const bb = g.boundingBox!
+        out[m.name] = { geo: g, center: bb.getCenter(new THREE.Vector3()), size: bb.getSize(new THREE.Vector3()) }
+      }
+    })
+    return out
+  }, [gltf])
+
+  // Disco articular: figura ESQUEMÁTICA (no procede de la malla) situada entre la cabeza ulnar y el carpo.
+  const disc = useMemo(() => {
+    const u = parts.ulna, r = parts.radio
+    if (!u || !r) return null
+    const uMin = u.center.y - u.size.y / 2
+    const xr = r.center.x + r.size.x / 2
+    const xu = u.center.x + u.size.x / 2
+    const cx = (xr + xu) / 2
+    return { pos: new THREE.Vector3(cx, uMin - 0.12, u.center.z + 0.2), rx: Math.max(0.9, (xu - xr) / 2 + 0.3), rz: 0.8 }
+  }, [parts])
+
+  const mats = useMemo(() => {
+    const bone = fadeMaterial('#e7dcc4'), dim = fadeMaterial('#5d7183'), sel = fadeMaterial('#cfeefa'), hov = fadeMaterial('#efe3c5')
+    sel.emissive = new THREE.Color('#2a8fb4'); sel.emissiveIntensity = 0.55
+    hov.emissive = new THREE.Color('#4a3d22'); hov.emissiveIntensity = 0.5
+    dim.opacity = 0.55
+    return { bone, dim, sel, hov }
+  }, [])
+
+  useEffect(() => { t0.current = performance.now() }, [p.selected])
+
+  useFrame(() => {
+    const tx = p.motion === 'flexion' ? 0.9 : p.motion === 'extension' ? -0.8 : 0
+    const tz = p.motion === 'radial' ? 0.3 : p.motion === 'ulnar' ? -0.55 : 0
+    ang.current.x += (tx - ang.current.x) * 0.1
+    ang.current.z += (tz - ang.current.z) * 0.1
+    // Rotación didáctica alrededor de la cabeza del hueso grande (origen del modelo).
+    if (hand.current) hand.current.rotation.set(-ang.current.x, 0, -ang.current.z)
+    // Ring de "análisis" y anclaje 2D para la ficha flotante
+    const s = p.selected && parts[p.selected]
+    if (s && ring.current) {
+      const c = s.center.clone()
+      if (HAND.includes(p.selected!) && hand.current) { c.applyEuler(hand.current.rotation) }
+      const off = explodeOffset(p.selected!, parts, p.explode)
+      c.add(off)
+      ring.current.visible = true
+      ring.current.position.copy(c)
+      ring.current.quaternion.copy(camera.quaternion)
+      const k = ((performance.now() - t0.current) / 900)
+      const sc = Math.max(s.size.x, s.size.y, s.size.z) * (0.7 + Math.min(k, 1) * 0.9)
+      ring.current.scale.setScalar(sc)
+      const mat = ring.current.material as THREE.MeshBasicMaterial
+      mat.opacity = k < 1 ? 0.9 * (1 - k) : 0
+      const v = c.clone().project(camera)
+      const x = (v.x * 0.5 + 0.5) * size.width, y = (-v.y * 0.5 + 0.5) * size.height
+      if (Math.abs(x - last.current.x) > 1 || Math.abs(y - last.current.y) > 1) {
+        last.current = { x, y }
+        p.onAnchor?.({ x, y, w: size.width, h: size.height })
+      }
+    } else if (ring.current) {
+      ring.current.visible = false
+      if (last.current.x !== -1) { last.current = { x: -1, y: -1 }; p.onAnchor?.(null) }
+    }
+  })
+
+  const matFor = (id: string) => p.selected === id ? mats.sel : p.focus && p.selected ? mats.dim : hover === id ? mats.hov : mats.bone
+  const mesh = (id: string) => {
+    const part = parts[id]; if (!part) return null
+    const off = explodeOffset(id, parts, p.explode)
+    return (
+      <mesh key={id} geometry={part.geo} material={matFor(id)} position={off}
+        onClick={e => { if (e.delta > 6) return; e.stopPropagation(); p.onSelect(id) }}
+        onPointerOver={e => { e.stopPropagation(); setHover(id); document.body.style.cursor = 'pointer' }}
+        onPointerOut={() => { setHover(null); document.body.style.cursor = '' }}>
+        {p.selected === id && <Outlines thickness={0.035} color={CYAN} />}
+      </mesh>)
+  }
+  const discSel = p.selected === 'disco'
+  return (
+    <>
+      <group>{FORE.map(mesh)}
+        {disc && (
+          <mesh position={disc.pos.clone().add(new THREE.Vector3(0, -p.explode * 0.5, 0))} scale={[disc.rx, 0.07, disc.rz]}
+            onClick={e => { if (e.delta > 6) return; e.stopPropagation(); p.onSelect('disco') }}
+            onPointerOver={e => { e.stopPropagation(); setHover('disco'); document.body.style.cursor = 'pointer' }}
+            onPointerOut={() => { setHover(null); document.body.style.cursor = '' }}>
+            <sphereGeometry args={[1, 32, 12]} />
+            <meshStandardMaterial color={discSel ? CYAN : '#4aa3b8'} transparent opacity={p.focus && p.selected && !discSel ? 0.15 : 0.55} emissive={discSel ? '#2a8fb4' : '#0c3a4a'} />
+            {discSel && <Outlines thickness={0.04} color={CYAN} />}
+          </mesh>)}
+      </group>
+      <group ref={hand}>{HAND.map(mesh)}</group>
+      <mesh ref={ring} visible={false}><ringGeometry args={[0.92, 1, 64]} /><meshBasicMaterial color={CYAN} transparent opacity={0} depthTest={false} side={THREE.DoubleSide} /></mesh>
+    </>
+  )
+}
+
+function explodeOffset(id: string, parts: Record<string, { center: THREE.Vector3 }>, k: number) {
+  const c = parts[id].center
+  const d = c.clone().sub(new THREE.Vector3(0.2, 1.8, 0)); d.y *= 0.4
+  return d.normalize().multiplyScalar(k * 2.2)
 }
 
 function CamRig({ view, nonce, ctl, zoomCmd }: { view: ViewKey; nonce: number; ctl: React.RefObject<any>; zoomCmd?: { n: number; f: number } }) {
-  const { camera } = useThree()
-  useEffect(() => { if (zoomCmd && zoomCmd.n) { const t = camera.position.clone().multiplyScalar(zoomCmd.f); const l = t.length(); if (l > 5 && l < 26) { camera.position.copy(t); ctl.current?.update() } } }, [zoomCmd?.n])
+  const { camera, size } = useThree()
+  const dist = DIST * Math.max(1, 1.0 / (size.width / size.height))
   const target = useRef<THREE.Vector3 | null>(null)
-  useEffect(() => { target.current = new THREE.Vector3(...VIEW_POS[view]) }, [view, nonce])
+  useEffect(() => { target.current = new THREE.Vector3(...DIRS[view]).normalize().multiplyScalar(dist).add(TARGET) }, [view, nonce, dist])
+  useEffect(() => {
+    if (!zoomCmd || !zoomCmd.n) return
+    const rel = camera.position.clone().sub(TARGET).multiplyScalar(zoomCmd.f)
+    const l = rel.length(); if (l > 4 && l < 28) { camera.position.copy(rel.add(TARGET)); ctl.current?.update() }
+  }, [zoomCmd?.n])
   useFrame(() => {
     if (!target.current) return
     camera.position.lerp(target.current, 0.12)
-    camera.lookAt(0, -0.8, 0)
+    camera.lookAt(TARGET)
     ctl.current?.update()
     if (camera.position.distanceTo(target.current) < 0.02) target.current = null
   })
   return null
 }
 
-function Scene({ selected, onSelect, explode, motion, focus, hover, setHover }: {
-  selected: string | null; onSelect: (id: string | null) => void; explode: number; motion: Motion; focus: boolean
-  hover: string | null; setHover: (h: string | null) => void
-}) {
-  const geoms = useMemo(() => PARTS.map(p => blob(p.r, p.seed)), [])
-  const hand = useRef<THREE.Group>(null)
-  const refs = useRef<(THREE.Mesh | null)[]>([])
-  const ang = useRef({ x: 0, z: 0 })
-  useFrame(() => {
-    const tx = motion === 'flexion' ? 0.9 : motion === 'extension' ? -0.8 : 0
-    const tz = motion === 'radial' ? 0.3 : motion === 'ulnar' ? -0.55 : 0
-    ang.current.x += (tx - ang.current.x) * 0.1
-    ang.current.z += (tz - ang.current.z) * 0.1
-    if (hand.current) {
-      // Rotación alrededor de la cabeza del hueso grande (eje didáctico de la mediocarpiana).
-      hand.current.position.copy(PIVOT)
-      hand.current.rotation.set(ang.current.x, 0, ang.current.z)
-      hand.current.position.set(PIVOT.x, PIVOT.y, PIVOT.z)
-    }
-    PARTS.forEach((p, i) => {
-      const m = refs.current[i]; if (!m) return
-      const base = new THREE.Vector3(...p.pos)
-      const dir = base.clone().sub(CENTER).normalize()
-      const off = dir.multiplyScalar(explode * 1.4)
-      const local = p.group === 'hand' ? base.clone().sub(PIVOT) : base.clone()
-      m.position.copy(local.add(p.group === 'hand' ? off : off))
-    })
-  })
-  const color = (p: Part) => (p.sel === false ? '#6f7a86' : p.mesh === 'disco' ? '#6fb3c0' : '#e6dcc3')
-  const mk = (g: 'fore' | 'hand') => PARTS.map((p, i) => p.group !== g ? null : (
-    <mesh key={i} ref={el => { refs.current[i] = el }} geometry={geoms[i]} rotation={p.rot}
-      onClick={e => { if (p.sel === false) return; if (e.delta > 6) return; e.stopPropagation(); onSelect(p.mesh) }}
-      onPointerOver={e => { if (p.sel === false) return; e.stopPropagation(); setHover(p.mesh); document.body.style.cursor = 'pointer' }}
-      onPointerOut={() => { setHover(null); document.body.style.cursor = '' }}>
-      <meshStandardMaterial color={selected === p.mesh ? '#e4c27c' : color(p)} roughness={0.55} metalness={0.05}
-        emissive={selected === p.mesh ? '#c5a774' : hover === p.mesh ? '#4a3d22' : '#000'} emissiveIntensity={selected === p.mesh ? 0.55 : 0.5}
-        transparent opacity={p.sel === false ? 0.35 : focus && selected && selected !== p.mesh ? 0.45 : p.mesh === 'disco' ? 0.8 : 1} />
-    </mesh>))
-  return (
-    <>
-      <group>{mk('fore')}</group>
-      <group ref={hand}>{mk('hand')}</group>
-    </>
-  )
+export function Loader() {
+  const { active, progress } = useProgress()
+  if (!active) return null
+  return <div className="loader">Cargando modelo anatómico · {Math.round(progress)} %</div>
 }
 
 export default function Wrist3D(props: {
   selected: string | null; onSelect: (id: string | null) => void; explode?: number; motion?: Motion
-  focus?: boolean; view: ViewKey; nonce: number; resetKey?: number; autoRotate?: boolean; zoom?: boolean; zoomCmd?: { n: number; f: number }
+  focus?: boolean; view: ViewKey; nonce: number; resetKey?: number; autoRotate?: boolean; zoom?: boolean
+  zoomCmd?: { n: number; f: number }; onAnchor?: (a: Anchor | null) => void
 }) {
   const ctl = useRef<any>(null)
-  const [hover, setHover] = useState<string | null>(null)
   return (
-    <Canvas camera={{ position: VIEW_POS.palmar, fov: 38 }} dpr={[1, 2]} onPointerMissed={() => props.onSelect(null)}
-      style={{ touchAction: 'none' }}>
-      <color attach="background" args={['#07111d']} />
-      <hemisphereLight args={['#bcd6e8', '#1a1410', 0.9]} />
-      <directionalLight position={[5, 6, 8]} intensity={2.2} color="#fff1d6" />
-      <directionalLight position={[-6, 2, -6]} intensity={1.2} color="#5fa8b8" />
-      <directionalLight position={[0, -6, 4]} intensity={0.5} color="#c5a774" />
-      <Scene selected={props.selected} onSelect={props.onSelect} explode={props.explode ?? 0} motion={props.motion ?? 'neutro'}
-        focus={props.focus ?? false} hover={hover} setHover={setHover} />
-      <OrbitControls ref={ctl} enablePan={false} enableZoom={props.zoom ?? true} autoRotate={props.autoRotate} autoRotateSpeed={0.6} enableDamping dampingFactor={0.1} minDistance={5} maxDistance={26} target={[0, -0.8, 0]} />
-      <CamRig view={props.view} nonce={props.nonce + (props.resetKey ?? 0)} ctl={ctl} zoomCmd={props.zoomCmd} />
-    </Canvas>
+    <>
+      <Canvas camera={{ position: [0, 2.6, DIST + 2.6], fov: 36, near: 0.5, far: 80 }} dpr={[1, 2]} onPointerMissed={() => props.onSelect(null)} style={{ touchAction: 'none' }}>
+        <color attach="background" args={['#06101b']} />
+        <hemisphereLight args={['#a9d3ea', '#1a1410', 0.8]} />
+        <directionalLight position={[5, 8, 9]} intensity={2.1} color="#fff1d6" />
+        <directionalLight position={[-7, 3, -6]} intensity={1.3} color="#5fb8d8" />
+        <directionalLight position={[0, -6, 5]} intensity={0.5} color="#c5a774" />
+        <Suspense fallback={null}>
+          <Model selected={props.selected} onSelect={props.onSelect} explode={props.explode ?? 0} motion={props.motion ?? 'neutro'}
+            focus={props.focus ?? false} onAnchor={props.onAnchor} />
+        </Suspense>
+        <OrbitControls ref={ctl} enablePan={false} enableZoom={props.zoom ?? true} autoRotate={props.autoRotate} autoRotateSpeed={0.6}
+          enableDamping dampingFactor={0.1} minDistance={5} maxDistance={26} target={TARGET.toArray()} />
+        <CamRig view={props.view} nonce={props.nonce + (props.resetKey ?? 0)} ctl={ctl} zoomCmd={props.zoomCmd} />
+      </Canvas>
+      <Loader />
+    </>
   )
 }
+useGLTF.preload(URL_GLB)

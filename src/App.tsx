@@ -20,6 +20,7 @@ export default function App() {
         </nav>
       </header>
       {h === '#lab' ? <Lab /> : mod && MODULES.some(m => m.id === mod) ? <ModulePage key={mod} id={mod} /> : <Home />}
+      <footer className="credits">Modelo 3D: huesos de <b>BodyParts3D</b>, © The Database Center for Life Science (DBCLS), licencia CC BY-SA 2.1 JP; procesados (recorte, subdivisión, suavizado) para este museo. Ilustraciones: Moore (9.ª ed.), Latarjet–Ruiz Liard (5.ª ed.) y Rouvière–Delmas (11.ª ed.), uso académico privado.</footer>
     </>
   )
 }

@@ -52,8 +52,9 @@ function blob(r: [number, number, number], seed: number) {
   return g
 }
 
-function CamRig({ view, nonce, ctl }: { view: ViewKey; nonce: number; ctl: React.RefObject<any> }) {
+function CamRig({ view, nonce, ctl, zoomCmd }: { view: ViewKey; nonce: number; ctl: React.RefObject<any>; zoomCmd?: { n: number; f: number } }) {
   const { camera } = useThree()
+  useEffect(() => { if (zoomCmd && zoomCmd.n) { const t = camera.position.clone().multiplyScalar(zoomCmd.f); const l = t.length(); if (l > 5 && l < 26) { camera.position.copy(t); ctl.current?.update() } } }, [zoomCmd?.n])
   const target = useRef<THREE.Vector3 | null>(null)
   useEffect(() => { target.current = new THREE.Vector3(...VIEW_POS[view]) }, [view, nonce])
   useFrame(() => {
@@ -102,7 +103,7 @@ function Scene({ selected, onSelect, explode, motion, focus, hover, setHover }: 
       onPointerOut={() => { setHover(null); document.body.style.cursor = '' }}>
       <meshStandardMaterial color={selected === p.mesh ? '#e4c27c' : color(p)} roughness={0.55} metalness={0.05}
         emissive={selected === p.mesh ? '#c5a774' : hover === p.mesh ? '#4a3d22' : '#000'} emissiveIntensity={selected === p.mesh ? 0.55 : 0.5}
-        transparent opacity={p.sel === false ? 0.35 : focus && selected && selected !== p.mesh ? 0.3 : p.mesh === 'disco' ? 0.8 : 1} />
+        transparent opacity={p.sel === false ? 0.35 : focus && selected && selected !== p.mesh ? 0.45 : p.mesh === 'disco' ? 0.8 : 1} />
     </mesh>))
   return (
     <>
@@ -114,7 +115,7 @@ function Scene({ selected, onSelect, explode, motion, focus, hover, setHover }: 
 
 export default function Wrist3D(props: {
   selected: string | null; onSelect: (id: string | null) => void; explode?: number; motion?: Motion
-  focus?: boolean; view: ViewKey; nonce: number; resetKey?: number; autoRotate?: boolean; zoom?: boolean
+  focus?: boolean; view: ViewKey; nonce: number; resetKey?: number; autoRotate?: boolean; zoom?: boolean; zoomCmd?: { n: number; f: number }
 }) {
   const ctl = useRef<any>(null)
   const [hover, setHover] = useState<string | null>(null)
@@ -129,7 +130,7 @@ export default function Wrist3D(props: {
       <Scene selected={props.selected} onSelect={props.onSelect} explode={props.explode ?? 0} motion={props.motion ?? 'neutro'}
         focus={props.focus ?? false} hover={hover} setHover={setHover} />
       <OrbitControls ref={ctl} enablePan={false} enableZoom={props.zoom ?? true} autoRotate={props.autoRotate} autoRotateSpeed={0.6} enableDamping dampingFactor={0.1} minDistance={5} maxDistance={26} target={[0, -0.8, 0]} />
-      <CamRig view={props.view} nonce={props.nonce + (props.resetKey ?? 0)} ctl={ctl} />
+      <CamRig view={props.view} nonce={props.nonce + (props.resetKey ?? 0)} ctl={ctl} zoomCmd={props.zoomCmd} />
     </Canvas>
   )
 }

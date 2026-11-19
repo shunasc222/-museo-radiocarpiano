@@ -1,24 +1,29 @@
-import Wrist3D from './Wrist3D'
 import { MODULES } from '../data/modules'
+import { byN, imgUrl, SRC_NAME } from '../data/images'
 
 export default function Home() {
+  const fig = byN(26)
   return (
     <>
-      <section className="hero">
-        <div className="herocanvas"><Wrist3D selected={null} onSelect={() => {}} view="palmar" nonce={0} autoRotate zoom={false} /></div>
-        <div className="herotext">
+      <section className="hero2">
+        <figure className="plate" aria-label={fig.cap}>
+          <div className="plateimg"><img src={imgUrl(fig.file)} alt={fig.cap} /></div>
+          <figcaption>Lámina · {fig.cap}<br />{SRC_NAME[fig.src]}</figcaption>
+        </figure>
+        <div className="herotext2">
           <p className="eyebrow">Pontificia Universidad Católica del Ecuador · Sede Santo Domingo</p>
-          <h1>Museo Anatómico <em>Interactivo</em></h1>
-          <h2>Articulación radiocarpiana</h2>
-          <p className="lead">Un recorrido por la muñeca: atlas anatómico auténtico, recreación tridimensional y fichas de estudio para la carrera de Medicina — Morfofunción Osteomuscular.</p>
-          <div className="cta"><a className="btn gold" href="#lab">Iniciar exploración</a><a className="btn" href="#modulos">Explorar módulos</a></div>
+          <h1>Articulación<br /><em>radiocarpiana</em></h1>
+          <p className="kicker">Museo anatómico interactivo</p>
+          <p className="lead">Atlas auténtico, recreación tridimensional y fichas de estudio de la muñeca. Carrera de Medicina · Morfofunción Osteomuscular.</p>
+          <div className="cta"><a className="btn gold" href="#lab">Iniciar exploración</a><a className="btn ghost" href="#modulos">Explorar módulos</a></div>
+          <p className="facts"><span><b>10</b> módulos</span><span><b>64</b> láminas</span><span><b>2D + 3D</b> sincronizados</span></p>
         </div>
       </section>
       <section id="modulos" className="modsec">
-        <p className="eyebrow">Recorrido</p><h2 className="big">Diez módulos</h2>
-        <div className="modgrid">{MODULES.map(m => (
-          <a key={m.id} href={`#m-${m.id}`} className="mod"><span className="num">{String(m.n).padStart(2, '0')}</span><b>{m.titulo}</b><small>{m.lema}</small></a>))}</div>
-        <a className="labcard" href="#lab"><span className="eyebrow">Función central</span><b>Laboratorio comparativo 2D + 3D</b><small>Atlas auténtico a la izquierda, modelo tridimensional a la derecha, ficha anatómica sincronizada.</small></a>
+        <div className="modhead"><p className="eyebrow">Recorrido</p><h2 className="big">Diez módulos <em>de estudio</em></h2></div>
+        <ol className="modlist">{MODULES.map(m => (
+          <li key={m.id}><a href={`#m-${m.id}`}><span className="num">{String(m.n).padStart(2, '0')}</span><b>{m.titulo}</b><small>{m.lema}</small><i aria-hidden>→</i></a></li>))}</ol>
+        <a className="labband" href="#lab"><span className="eyebrow">Función central</span><b>Laboratorio comparativo <em>2D + 3D</em></b><small>Atlas a la izquierda, modelo tridimensional a la derecha, ficha sincronizada.</small></a>
       </section>
     </>
   )

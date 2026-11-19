@@ -15,6 +15,7 @@ export default function Lab() {
   const [motion, setMotion] = useState<Motion>('neutro')
   const [focus, setFocus] = useState(true)
   const [sheet, setSheet] = useState(true)
+  const [zc, setZc] = useState({ n: 0, f: 1 })
   const v = LAB_VIEWS[vi]
   const pick = (id: string | null) => { setSel(id); if (id) setSheet(true) }
   const inView = sel ? v.hotspots.some(h => h.id === sel) : true
@@ -32,7 +33,9 @@ export default function Lab() {
         </section>
         <section className="pane">
           <div className="phd"><span>Recreación anatómica 3D</span><span className="muted">Geometría didáctica</span></div>
-          <div className="viewer3d"><Wrist3D selected={sel} onSelect={id => id ? pick(id) : setSel(null)} explode={explode} motion={motion} focus={focus} view={view} nonce={nonce} />
+          <div className="viewer3d"><Wrist3D selected={sel} onSelect={id => id ? pick(id) : setSel(null)} explode={explode} motion={motion} focus={focus} view={view} nonce={nonce} zoomCmd={zc} />
+            <div className="hint">Arrastre para rotar</div>
+            <div className="zoom"><button aria-label="Acercar" onClick={() => setZc(z => ({ n: z.n + 1, f: 0.8 }))}>+</button><button aria-label="Alejar" onClick={() => setZc(z => ({ n: z.n + 1, f: 1.25 }))}>−</button></div>
             <div className="hud">{sel && MESH_IDS.includes(sel) ? STRUCTURES[sel].nombre : 'Toque un hueso'}</div></div>
           <div className="ctrl"><span className="lbl">Orientación</span><div className="tabs">{VIEWS.map(([k, n]) => <button key={k} className={view === k ? 'on' : ''} onClick={() => { setView(k); setNonce(x => x + 1) }}>{n}</button>)}</div></div>
           <div className="ctrl"><span className="lbl">Movimiento (esquemático)</span><div className="tabs">{MOTIONS.map(([k, n]) => <button key={k} className={motion === k ? 'on' : ''} onClick={() => setMotion(k)}>{n}</button>)}</div></div>

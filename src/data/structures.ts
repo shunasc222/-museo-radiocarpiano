@@ -1,246 +1,200 @@
+/**
+ * Estructuras óseas y articulares del atlas (osteología y superficies).
+ * Contenido redactado a partir de conocimiento anatómico establecido; ver bibliografía.
+ */
+export type Participation = 'directa' | 'relacionada'
+
 export interface Structure {
-  id: string; nombre: string; tipo: 'Hueso' | 'Ligamento' | 'Articulación' | 'Fibrocartílago'
-  ubicacion: string; morfologia: string; relaciones: string; inserciones?: string
-  funcion: string; biomecanica: string; clinica: string
+  id: string
+  num: number
+  nombre: string
+  grupo: 'Radio' | 'Ulna' | 'Carpo' | 'Partes blandas'
+  participacion: Participation
+  /** Texto breve que explica el tipo de participación en la articulación. */
+  participacionNota: string
+  ubicacion: string
+  descripcion: string
+  funcion: string
+  relaciones: string
+  clinica: string
+  /** Pista anatómica (sin nombrar la estructura) para el modo de autoevaluación. */
+  pista: string
+  /** Si es una agrupación, ids que se resaltan junto con ella. */
+  hijos?: string[]
+  /** Aparece como zona seleccionable en el esquema (false = solo en la lista). */
+  enEsquema: boolean
 }
 
-export const STRUCTURES: Record<string, Structure> = {
-  radio: {
-    id: 'radio', nombre: 'Radio (extremidad distal)', tipo: 'Hueso',
-    ubicacion: 'Hueso lateral del antebrazo; su extremidad distal forma la porción proximal y principal de la articulación radiocarpiana.',
-    morfologia: 'Extremidad inferior ensanchada. La cara carpiana presenta dos fosas separadas por una cresta roma: la fosa escafoidea (lateral) y la fosa semilunar (medial). Lateralmente se proyecta el proceso estiloides; medialmente, la escotadura ulnar recibe la cabeza de la ulna; dorsalmente, el tubérculo dorsal separa surcos para tendones extensores.',
-    relaciones: 'Distal: escafoides y semilunar. Medial: cabeza de la ulna (articulación radioulnar distal) y disco articular. Dorsal: tendones extensores en sus compartimentos. Palmar: músculo pronador cuadrado y tendones flexores.',
-    inserciones: 'Proceso estiloides: ligamento colateral radial del carpo y tendón del braquiorradial (base). Bordes de la cara carpiana: cápsula y ligamentos radiocarpianos palmar y dorsal. Base del disco articular en el borde medial de la escotadura ulnar.',
-    funcion: 'Soporta la mayor parte de la carga axial transmitida desde la mano hacia el antebrazo y proporciona la cavidad glenoidea antebraquial.',
-    biomecanica: 'La superficie carpiana está inclinada hacia ulnar (inclinación radial) y ligeramente hacia palmar (inclinación palmar); ambas orientan el cóndilo carpiano y son parámetros radiográficos de referencia.',
-    clinica: 'Sitio frecuente de fractura: Colles (extremo distal, fragmento desplazado dorsalmente), Smith (desplazamiento palmar) y Barton (fractura marginal con subluxación carpiana). La pérdida de inclinación altera la biomecánica de la muñeca.'
+export const STRUCTURES: Structure[] = [
+  {
+    id: 'radio-distal', num: 1, nombre: 'Radio distal', grupo: 'Radio', participacion: 'directa',
+    participacionNota: 'Forma la mayor parte de la superficie proximal (antebraquial) de la articulación radiocarpiana.',
+    ubicacion: 'Extremo distal del hueso lateral del antebrazo, en el lado del pulgar.',
+    descripcion: 'Epífisis ensanchada, de sección cuadrangular, con cara distal articular (carpiana), apófisis estiloides lateral, escotadura ulnar medial y un tubérculo dorsal (de Lister) que separa surcos para tendones extensores.',
+    funcion: 'Recibe y transmite al antebrazo la mayor parte de la carga que viene de la mano (se suele citar en torno al 80 % cuando la ulna tiene longitud neutra).',
+    relaciones: 'Distal: escafoides y semilunar. Medial: cabeza de la ulna (articulación radioulnar distal) y disco articular. Dorsal: tendones extensores. Palmar: pronador cuadrado y tendones flexores.',
+    clinica: 'Su extremo distal es uno de los sitios de fractura más frecuentes del miembro superior tras una caída sobre la mano extendida (fractura distal del radio; tipo Colles en el adulto mayor).',
+    pista: 'Hueso lateral del antebrazo; su extremo distal se ensancha y su cara inferior está inclinada hacia el lado ulnar.',
+    enEsquema: true,
   },
-  ulna: {
-    id: 'ulna', nombre: 'Ulna (cabeza y proceso estiloides)', tipo: 'Hueso',
-    ubicacion: 'Hueso medial del antebrazo; su extremidad distal queda separada del carpo por el disco articular.',
-    morfologia: 'Cabeza redondeada con circunferencia articular que se aloja en la escotadura ulnar del radio; el proceso estiloides se proyecta posteromedialmente. Un surco en la cara posterior de la cabeza aloja el tendón del extensor ulnar del carpo.',
-    relaciones: 'Lateral: escotadura ulnar del radio. Distal: disco articular (no articula directamente con el carpo). Dorsal: tendón del extensor ulnar del carpo.',
-    inserciones: 'Proceso estiloides: ligamento colateral ulnar del carpo y vértice del disco articular (complejo fibrocartilaginoso triangular).',
-    funcion: 'Constituye el pilar fijo del antebrazo alrededor del cual rota el radio en pronosupinación; transmite una fracción menor de la carga a través del disco.',
-    biomecanica: 'La longitud relativa respecto al radio (varianza ulnar) modifica la carga sobre el disco articular.',
-    clinica: 'La ulna no pertenece a la articulación radiocarpiana propiamente dicha: pertenece a la radioulnar distal. Una ulna relativamente larga se asocia a síndrome de choque ulnar con sobrecarga del complejo fibrocartilaginoso.'
+  {
+    id: 'estiloides-radio', num: 2, nombre: 'Apófisis estiloides del radio', grupo: 'Radio', participacion: 'directa',
+    participacionNota: 'Prolongación lateral de la superficie articular; punto de anclaje del ligamento colateral radial.',
+    ubicacion: 'Prolongación cónica del borde lateral del radio distal; se palpa en la base del pulgar.',
+    descripcion: 'Proyección distal más larga que la estiloides ulnar. En su base se inserta el tendón del braquiorradial y, en su vértice, el ligamento colateral radial del carpo.',
+    funcion: 'Ancla el ligamento colateral radial y limita la desviación radial al contactar con el escafoides; su mayor longitud explica que la desviación ulnar sea más amplia que la radial.',
+    relaciones: 'Tabaquera anatómica: tendones del abductor largo y extensor corto del pulgar (lateral); arteria radial pasa en profundidad. Escafoides en su cara distal.',
+    clinica: 'Su fractura aislada (fractura de Chauffeur) puede asociarse a lesiones ligamentosas del carpo; es sitio de tenosinovitis de De Quervain en su vecindad.',
+    pista: 'Punta ósea más lateral y distal de la muñeca; se palpa en la base del pulgar.',
+    enEsquema: true,
   },
-  escafoides: {
-    id: 'escafoides', nombre: 'Escafoides', tipo: 'Hueso',
-    ubicacion: 'Hueso más lateral de la hilera proximal del carpo.',
-    morfologia: 'Forma de barco, con polo proximal, cintura y polo distal; el tubérculo se proyecta en la cara palmar. Superficie proximal convexa para la fosa escafoidea del radio.',
-    relaciones: 'Proximal: radio. Medial: semilunar y cabeza del hueso grande. Distal: trapecio y trapezoide. Su cintura cruza ambas hileras y lo vincula a la estabilidad mediocarpiana. Lateral: arteria radial en la tabaquera anatómica.',
-    inserciones: 'Tubérculo: retináculo flexor (ligamento transverso del carpo) y ligamento colateral radial.',
-    funcion: 'Une mecánicamente la hilera proximal con la distal.',
-    biomecanica: 'Se flexiona en la desviación radial y se extiende en la ulnar; actúa como puente entre ambas hileras.',
-    clinica: 'Es el hueso carpiano más fracturado; dolor en la tabaquera anatómica. Su irrigación es principalmente retrógrada (desde distal): riesgo de necrosis avascular del polo proximal y no consolidación. Las fracturas pueden no verse en la radiografía inicial.'
+  {
+    id: 'superficie-articular', num: 3, nombre: 'Superficie articular carpiana del radio', grupo: 'Radio', participacion: 'directa',
+    participacionNota: 'Es la parte ósea de la superficie proximal; se completa con el disco articular.',
+    ubicacion: 'Cara distal del radio, cóncava en ambos ejes e inclinada hacia ulnar (≈ 22° en la proyección frontal) y hacia palmar (≈ 11° en la lateral).',
+    descripcion: 'Superficie triangular cubierta de cartílago hialino, dividida por la cresta interfacetaria en dos fositas: escafoidea (lateral) y semilunar (medial).',
+    funcion: 'Constituye, junto con el disco articular, la cavidad (superficie antebraquial) en la que se mueve el cóndilo carpiano.',
+    relaciones: 'Se continúa medialmente con el disco articular, que prolonga la superficie hasta la estiloides ulnar. Está rodeada por la cápsula y los ligamentos radiocarpianos.',
+    clinica: 'Las fracturas intraarticulares del radio distal alteran esta superficie; un escalón mayor de 1–2 mm se asocia a artrosis postraumática. Pérdida de inclinación = alteración de la carga carpiana.',
+    pista: 'Superficie cóncava, cubierta de cartílago, que recibe a los huesos de la fila proximal del carpo.',
+    hijos: ['fosita-escafoidea', 'fosita-semilunar', 'cresta-interfacetaria'],
+    enEsquema: false,
   },
-  semilunar: {
-    id: 'semilunar', nombre: 'Semilunar', tipo: 'Hueso',
-    ubicacion: 'Hueso central de la hilera proximal, frente a la fosa semilunar del radio.',
-    morfologia: 'Forma de media luna; cara proximal convexa, cara distal cóncava que aloja la cabeza del hueso grande.',
-    relaciones: 'Proximal: radio y disco articular. Lateral: escafoides. Medial: piramidal. Distal: hueso grande. Su cara palmar se relaciona con el túnel carpiano.',
-    inserciones: 'Ligamentos interóseos escafosemilunar y semilunopiramidal; ligamentos radiocarpianos palmar y dorsal.',
-    funcion: 'Es la clave de la hilera proximal («segmento intercalado»), sin inserciones tendinosas.',
-    biomecanica: 'Responde a las fuerzas del escafoides y del piramidal mediante los ligamentos interóseos; su posición define la alineación del carpo.',
-    clinica: 'La lesión del ligamento escafosemilunar produce disociación (ensanchamiento del espacio en la radiografía). La luxación palmar puede comprimir el nervio mediano. Necrosis avascular: enfermedad de Kienböck.'
+  {
+    id: 'fosita-escafoidea', num: 4, nombre: 'Fosita escafoidea', grupo: 'Radio', participacion: 'directa',
+    participacionNota: 'Faceta lateral de la superficie articular del radio.',
+    ubicacion: 'Mitad lateral de la cara articular carpiana del radio, junto a la estiloides.',
+    descripcion: 'Faceta triangular, cóncava, para el polo proximal del escafoides.',
+    funcion: 'Recibe al escafoides; transmite al radio la carga que pasa por la columna radial del carpo (trapecio–trapezoide–escafoides).',
+    relaciones: 'Medial: cresta interfacetaria. Lateral: base de la estiloides radial. Distal: escafoides.',
+    clinica: 'Es la faceta más cargada en la caída sobre la mano extendida; su fractura (fractura de la estiloides o de la faceta escafoidea) compromete la congruencia con el escafoides.',
+    pista: 'Faceta lateral de la cara distal del radio, la más cercana a la estiloides.',
+    enEsquema: true,
   },
-  piramidal: {
-    id: 'piramidal', nombre: 'Piramidal (triquetro)', tipo: 'Hueso',
-    ubicacion: 'Hueso medial de la hilera proximal.',
-    morfologia: 'Forma piramidal; presenta una faceta palmar para el pisiforme y una faceta distal para el hueso ganchoso.',
-    relaciones: 'Lateral: semilunar. Palmar: pisiforme. Distal: hueso ganchoso. Proximal: disco articular durante la desviación ulnar.',
-    inserciones: 'Ligamento colateral ulnar del carpo; ligamentos radiocarpiano dorsal e intercarpiano dorsal; ligamento ulnocarpiano palmar.',
-    funcion: 'Completa el cóndilo carpiano en su borde ulnar.',
-    biomecanica: 'En la desviación ulnar se desliza sobre el hueso ganchoso (movimiento helicoidal) y aumenta su contacto con el disco articular.',
-    clinica: 'Sus fracturas son frecuentes (segunda en frecuencia entre las carpianas, usualmente avulsiones dorsales); la lesión del ligamento semilunopiramidal causa inestabilidad ulnar.'
+  {
+    id: 'fosita-semilunar', num: 5, nombre: 'Fosita semilunar', grupo: 'Radio', participacion: 'directa',
+    participacionNota: 'Faceta medial de la superficie articular del radio.',
+    ubicacion: 'Mitad medial de la cara articular carpiana del radio, junto a la escotadura ulnar.',
+    descripcion: 'Faceta cuadrangular, cóncava, para el semilunar; más palmar y dorsalmente definida por los bordes del radio.',
+    funcion: 'Recibe al semilunar; el semilunar también se apoya parcialmente en el disco articular.',
+    relaciones: 'Lateral: cresta interfacetaria. Medial: inserción del disco articular. Palmar y dorsal: bordes donde se anclan los ligamentos radiocarpianos.',
+    clinica: 'El fragmento palmar-medial (fragmento «en sacabocados» o die-punch) es clave en las fracturas intraarticulares: arrastrado por los ligamentos radiolunares, puede desplazarse con el semilunar.',
+    pista: 'Faceta medial de la cara distal del radio, junto al disco articular.',
+    enEsquema: true,
   },
-  pisiforme: {
-    id: 'pisiforme', nombre: 'Pisiforme', tipo: 'Hueso',
-    ubicacion: 'Sobre la cara palmar del piramidal, en el borde ulnar del carpo.',
-    morfologia: 'Pequeño hueso sesamoideo redondeado; una sola faceta articular (con el piramidal).',
-    relaciones: 'Articula únicamente con el piramidal (articulación pisipiramidal). Cercano al canal ulnar (nervio y arteria ulnares).',
-    inserciones: 'Tendón del flexor ulnar del carpo, ligamentos pisoganchoso y pisometacarpiano, retináculo flexor y origen del abductor del meñique.',
-    funcion: 'Aumenta el brazo de palanca del flexor ulnar del carpo.',
-    biomecanica: 'Funciona como polea y punto de anclaje de los estabilizadores ulnares.',
-    clinica: 'Fracturas por traumatismo directo; artrosis pisipiramidal. Referencia palpable para localizar el canal ulnar.'
+  {
+    id: 'cresta-interfacetaria', num: 6, nombre: 'Cresta interfacetaria radial', grupo: 'Radio', participacion: 'directa',
+    participacionNota: 'Reborde óseo que separa las dos fositas articulares del radio.',
+    ubicacion: 'Reborde romo, anteroposterior, entre las fositas escafoidea y semilunar.',
+    descripcion: 'Cresta roma y poco prominente que corresponde a la zona donde se alinea la unión escafolunar del carpo.',
+    funcion: 'Separa las dos facetas; en su vértice y alrededor se fijan fibras del ligamento radioescafosemilunar (de Testut y Kuentz).',
+    relaciones: 'Está enfrentada al ligamento escafolunar interóseo cuando la muñeca está en posición neutra.',
+    clinica: 'Un trazo de fractura que atraviesa la cresta divide el radio en fragmentos escafoideo y semilunar («fractura en T/Y»), lo que obliga a restaurar ambas facetas por separado.',
+    pista: 'Pequeña elevación entre dos concavidades de la cara distal del radio.',
+    enEsquema: true,
   },
-  trapecio: {
-    id: 'trapecio', nombre: 'Trapecio', tipo: 'Hueso',
-    ubicacion: 'Hueso más lateral de la hilera distal.',
-    morfologia: 'Presenta una faceta en silla de montar para el primer metacarpiano y un tubérculo palmar con surco para el tendón del flexor radial del carpo.',
-    relaciones: 'Proximal: escafoides. Medial: trapezoide. Distal: 1.er y 2.º metacarpianos.',
-    inserciones: 'Tubérculo: retináculo flexor, abductor corto y oponente del pulgar.',
-    funcion: 'Permite la movilidad del pulgar (articulación carpometacarpiana en silla).',
-    biomecanica: 'Pertenece a la articulación mediocarpiana; su movilidad condiciona la oposición del pulgar.',
-    clinica: 'Frecuente localización de artrosis trapeciometacarpiana (rizartrosis).'
+  {
+    id: 'escotadura-ulnar', num: 7, nombre: 'Escotadura ulnar del radio', grupo: 'Radio', participacion: 'relacionada',
+    participacionNota: 'Pertenece a la articulación radioulnar distal; en su borde inferior nace el disco articular.',
+    ubicacion: 'Concavidad vertical del borde medial del radio distal, orientada hacia la ulna.',
+    descripcion: 'Superficie cartilaginosa cóncava en la que rota la circunferencia articular de la cabeza de la ulna durante la pronosupinación.',
+    funcion: 'Forma la parte radial de la articulación radioulnar distal (trocoide). En su borde distal se inserta el disco articular.',
+    relaciones: 'Medial: cabeza de la ulna. Distal: base del disco articular y superficie articular del radio.',
+    clinica: 'Su incongruencia tras una fractura o una ulna mal alineada limita la pronosupinación y causa inestabilidad radioulnar distal.',
+    pista: 'Concavidad vertical en el borde medial del radio, en contacto con la cabeza de la ulna.',
+    enEsquema: true,
   },
-  trapezoide: {
-    id: 'trapezoide', nombre: 'Trapezoide', tipo: 'Hueso',
-    ubicacion: 'Hilera distal, entre el trapecio y el hueso grande.',
-    morfologia: 'Pequeño, en cuña, con una carilla distal para el 2.º metacarpiano.',
-    relaciones: 'Proximal: escafoides. Lateral: trapecio. Medial: hueso grande. Distal: 2.º metacarpiano.',
-    inserciones: 'Sin inserciones tendinosas propias; ligamentos intercarpianos y carpometacarpianos.',
-    funcion: 'Transmite fuerzas del índice al escafoides.',
-    biomecanica: 'Participa en la mediocarpiana en bloque con el resto de la hilera distal, que funciona como unidad.',
-    clinica: 'Raramente lesionado de forma aislada.'
+  {
+    id: 'ulna-distal', num: 8, nombre: 'Ulna distal y cabeza de la ulna', grupo: 'Ulna', participacion: 'relacionada',
+    participacionNota: 'No contacta con el carpo: la separa el disco articular. Pertenece a la articulación radioulnar distal.',
+    ubicacion: 'Extremo distal del hueso medial del antebrazo.',
+    descripcion: 'Cabeza redondeada con circunferencia articular y una cara distal («polo») cubierta de cartílago que se apoya sobre el disco articular. Un surco posterior aloja al tendón del extensor ulnar del carpo.',
+    funcion: 'Pivote estable alrededor del cual rota el radio en pronosupinación; transmite al disco una fracción menor de la carga.',
+    relaciones: 'Lateral: escotadura ulnar del radio. Distal: disco articular (la ulna NO articula directamente con los huesos del carpo). Dorsal: surco del extensor ulnar del carpo.',
+    clinica: 'Una ulna relativamente larga (varianza ulnar positiva) sobrecarga el disco y el semilunar: síndrome de impactación ulnocarpiana.',
+    pista: 'Extremo redondeado del hueso medial del antebrazo, separado del carpo por un fibrocartílago.',
+    enEsquema: true,
   },
-  grande: {
-    id: 'grande', nombre: 'Hueso grande (capitato)', tipo: 'Hueso',
-    ubicacion: 'Centro de la hilera distal; es el hueso más grande del carpo.',
-    morfologia: 'Cabeza redondeada proximal, cuello y cuerpo; su cabeza se aloja en la concavidad formada por el escafoides y el semilunar.',
-    relaciones: 'Proximal: escafoides y semilunar. Lateral: trapezoide. Medial: ganchoso. Distal: 3.er metacarpiano (también 2.º y 4.º).',
-    inserciones: 'Ligamentos intercarpianos y carpometacarpianos; origen de fibras del aductor del pulgar (cabeza oblicua).',
-    funcion: 'Eje central del carpo; relaciona la columna central de la mano.',
-    biomecanica: 'Los movimientos de flexión-extensión y desviación se producen alrededor de la cabeza del hueso grande (mediocarpiana).',
-    clinica: 'Su cabeza es la referencia de las luxaciones perisemilunares; riesgo de necrosis por irrigación distal-proximal (cuello).'
+  {
+    id: 'estiloides-ulnar', num: 9, nombre: 'Apófisis estiloides de la ulna', grupo: 'Ulna', participacion: 'relacionada',
+    participacionNota: 'Punto de anclaje del complejo fibrocartilaginoso triangular y del ligamento colateral ulnar.',
+    ubicacion: 'Prolongación posteromedial de la cabeza de la ulna.',
+    descripcion: 'Saliente cónico más corto que la estiloides radial. En su base (fóvea ulnar) se insertan las fibras profundas de los ligamentos radioulnares del disco.',
+    funcion: 'Ancla el vértice del disco articular y el sistema colateral ulnar; centro de la estabilidad del lado ulnar.',
+    relaciones: 'Lateral: disco articular. Dorsal: tendón del extensor ulnar del carpo. Distal: triquetrum (sin contacto articular directo).',
+    clinica: 'Su fractura, sobre todo si afecta la base, puede acompañar a fracturas distales del radio e indicar compromiso del complejo fibrocartilaginoso triangular y de la estabilidad radioulnar distal.',
+    pista: 'Pequeña punta ósea en el lado medial de la muñeca, detrás de la cabeza de la ulna.',
+    enEsquema: true,
   },
-  ganchoso: {
-    id: 'ganchoso', nombre: 'Hueso ganchoso (hamato)', tipo: 'Hueso',
-    ubicacion: 'Borde ulnar de la hilera distal.',
-    morfologia: 'Cuña con gancho palmar (hámulo) y facetas distales para el 4.º y 5.º metacarpianos.',
-    relaciones: 'Proximal: piramidal (y, en parte, semilunar). Lateral: hueso grande. Distal: 4.º y 5.º metacarpianos. El gancho forma la pared ulnar del túnel carpiano y se relaciona con el nervio ulnar (rama profunda).',
-    inserciones: 'Gancho: retináculo flexor, flexor corto y oponente del meñique, ligamento pisoganchoso.',
-    funcion: 'Cierra el borde ulnar del túnel carpiano; soporta la columna ulnar.',
-    biomecanica: 'Su carilla piramidal helicoidal participa en el movimiento de desviación ulnar.',
-    clinica: 'La fractura del gancho puede lesionar la rama profunda del nervio ulnar o los tendones flexores del 5.º dedo.'
+  {
+    id: 'disco', num: 10, nombre: 'Disco articular (fibrocartílago triangular)', grupo: 'Partes blandas', participacion: 'directa',
+    participacionNota: 'Completa la superficie proximal: separa la ulna de los huesos del carpo y articula con semilunar y piramidal.',
+    ubicacion: 'Entre el borde distal de la cabeza de la ulna y los huesos semilunar y piramidal; se extiende desde el radio hasta la base de la estiloides ulnar.',
+    descripcion: 'Lámina fibrocartilaginosa bicóncava, delgada en su centro y más gruesa en la periferia, anclada al radio (base de la escotadura ulnar) y a la fóvea de la ulna. Es el núcleo del complejo fibrocartilaginoso triangular (TFCC).',
+    funcion: 'Amortigua la carga ulnocarpiana, prolonga la superficie articular del radio, estabiliza la radioulnar distal y evita el contacto directo entre ulna y carpo.',
+    relaciones: 'Proximal: cabeza de la ulna. Distal: semilunar y piramidal. Su periferia se une a los ligamentos radioulnares palmar y dorsal, a la vaina del extensor ulnar del carpo y al ligamento colateral ulnar.',
+    clinica: 'Sus desgarros traumáticos (periféricos, mejor irrigados) o degenerativos (centrales, avasculares) causan dolor ulnar, chasquido y limitación en la desviación ulnar con carga.',
+    pista: 'Lámina fibrocartilaginosa delgada que separa la ulna del carpo.',
+    enEsquema: true,
   },
-  disco: {
-    id: 'disco', nombre: 'Disco articular (complejo fibrocartilaginoso triangular)', tipo: 'Fibrocartílago',
-    ubicacion: 'Entre la cabeza de la ulna y el piramidal/semilunar, prolongando medialmente la cavidad glenoidea antebraquial.',
-    morfologia: 'Fibrocartílago triangular: base en el borde medial de la escotadura ulnar del radio y vértice en la fosita del proceso estiloides de la ulna. Forma, con ligamentos radioulnares, colateral ulnar y vaina del extensor ulnar del carpo, el complejo fibrocartilaginoso triangular (CFCT).',
-    relaciones: 'Proximal: cabeza de la ulna. Distal: piramidal y semilunar. Separa la cavidad radioulnar distal de la radiocarpiana.',
-    inserciones: 'Radio (escotadura ulnar) y proceso estiloides de la ulna; se continúa con ligamentos radioulnares palmar y dorsal.',
-    funcion: 'Une radio y ulna distalmente, amortigua la carga ulnocarpiana y estabiliza la articulación radioulnar distal.',
-    biomecanica: 'Permite la pronosupinación sin perder congruencia con el carpo.',
-    clinica: 'Lesiones traumáticas o degenerativas del CFCT producen dolor ulnar de la muñeca, chasquidos e inestabilidad radioulnar distal. Su perforación comunica las sinoviales radiocarpiana y radioulnar distal.'
+  {
+    id: 'escafoides', num: 11, nombre: 'Escafoides', grupo: 'Carpo', participacion: 'directa',
+    participacionNota: 'Su cara proximal convexa articula con la fosita escafoidea del radio.',
+    ubicacion: 'Hueso más lateral de la fila proximal; forma el suelo de la tabaquera anatómica.',
+    descripcion: 'Hueso alargado y oblicuo con polo proximal, cintura y tubérculo distal palmar (palpable). Casi el 80 % de su superficie está cubierta de cartílago.',
+    funcion: 'Puente mecánico entre las dos filas del carpo: estabiliza el movimiento acoplado entre la fila proximal y la distal.',
+    relaciones: 'Proximal: fosita escafoidea del radio. Medial: semilunar (ligamento escafolunar interóseo) y hueso grande. Distal: trapecio y trapezoide. Dorsal-radial: arteria radial en la tabaquera.',
+    clinica: 'Hueso carpiano más fracturado. Irrigación retrógrada: el polo proximal es vulnerable a necrosis avascular y pseudoartrosis. La fractura puede no verse en la radiografía inicial.',
+    pista: 'Hueso en forma de barco alargado; su tubérculo se palpa en la base de la eminencia tenar.',
+    enEsquema: true,
   },
-  lrcpalmar: {
-    id: 'lrcpalmar', nombre: 'Ligamento radiocarpiano palmar', tipo: 'Ligamento',
-    ubicacion: 'Cara palmar de la articulación; del margen anterior del radio al carpo.',
-    morfologia: 'Haces oblicuos distal y medialmente hacia escafoides, semilunar, piramidal y hueso grande (porciones radioescafocapitata y radiosemilunar).',
-    relaciones: 'Profundo respecto a los tendones flexores y al túnel carpiano.',
-    inserciones: 'Margen anterior del radio y proceso estiloides; escafoides, semilunar, piramidal y hueso grande.',
-    funcion: 'Es el principal refuerzo anterior de la cápsula y evita el desplazamiento dorsal-ulnar del carpo.',
-    biomecanica: 'Restringe la extensión y transmite el movimiento del radio al carpo.',
-    clinica: 'Su rotura en fracturas de Barton o luxaciones produce inestabilidad carpiana.'
+  {
+    id: 'semilunar', num: 12, nombre: 'Semilunar', grupo: 'Carpo', participacion: 'directa',
+    participacionNota: 'Su cara proximal articula con la fosita semilunar del radio y, parcialmente, con el disco articular.',
+    ubicacion: 'Hueso central de la fila proximal, entre escafoides y piramidal.',
+    descripcion: 'Hueso en media luna con cara proximal convexa y cara distal cóncava para la cabeza del hueso grande; más ancho en su porción palmar.',
+    funcion: 'Es el «hueso clave» de la columna central: transmite la carga del hueso grande al radio y actúa como segmento intercalado entre ambas filas.',
+    relaciones: 'Lateral: escafoides. Medial: piramidal. Proximal: fosita semilunar y disco. Distal: cabeza del hueso grande (y ganchoso según la posición).',
+    clinica: 'Su luxación y la enfermedad de Kienböck (necrosis avascular) son causas de dolor central de la muñeca; con insuficiencia de ligamentos adyacentes se alinea en inclinación dorsal (DISI) o palmar (VISI).',
+    pista: 'Hueso en forma de luna creciente, en el centro de la primera fila del carpo.',
+    enEsquema: true,
   },
-  lrcdorsal: {
-    id: 'lrcdorsal', nombre: 'Ligamento radiocarpiano dorsal', tipo: 'Ligamento',
-    ubicacion: 'Cara dorsal; del margen posterior del radio hacia la hilera proximal.',
-    morfologia: 'Fibras oblicuas hacia ulnar y distal, dirigidas a semilunar y piramidal.',
-    relaciones: 'Profundo a los tendones extensores y sus vainas.',
-    inserciones: 'Margen posterior del radio; semilunar y piramidal.',
-    funcion: 'Refuerza la cápsula posterior.',
-    biomecanica: 'Limita la flexión palmar extrema.',
-    clinica: 'Contribuye a la estabilidad dorsal tras fracturas distales del radio.'
+  {
+    id: 'piramidal', num: 13, nombre: 'Piramidal (triquetrum)', grupo: 'Carpo', participacion: 'directa',
+    participacionNota: 'Participa sobre todo en la desviación ulnar, cuando entra en contacto con el disco articular.',
+    ubicacion: 'Hueso más medial de la fila proximal, debajo de la estiloides ulnar.',
+    descripcion: 'Hueso piramidal con cara proximal convexa y una carilla palmar para el pisiforme.',
+    funcion: 'Se desplaza bajo el ganchoso en un plano helicoidal durante la desviación; transmite carga al disco articular.',
+    relaciones: 'Lateral: semilunar (ligamento lunopiramidal interóseo). Distal: ganchoso. Palmar: pisiforme. Proximal: disco articular (no contacta con el radio en posición neutra).',
+    clinica: 'Es el segundo hueso carpiano más fracturado (fracturas por avulsión dorsal). La lesión del ligamento lunopiramidal produce dolor ulnar e inestabilidad.',
+    pista: 'Hueso piramidal del lado ulnar de la primera fila; en su cara palmar se apoya un hueso sesamoideo.',
+    enEsquema: true,
   },
-  lcradial: {
-    id: 'lcradial', nombre: 'Ligamento colateral radial del carpo', tipo: 'Ligamento',
-    ubicacion: 'Borde lateral de la articulación.',
-    morfologia: 'Banda corta del proceso estiloides del radio al escafoides.',
-    relaciones: 'Cercano a la arteria radial y a la tabaquera anatómica.',
-    inserciones: 'Proceso estiloides del radio; escafoides (y trapecio, según descripción).',
-    funcion: 'Estabiliza lateralmente.',
-    biomecanica: 'Limita la desviación ulnar excesiva.',
-    clinica: 'Se tensa en desviación ulnar; lesiones en caídas con la mano en abducción.'
+  {
+    id: 'pisiforme', num: 14, nombre: 'Pisiforme', grupo: 'Carpo', participacion: 'relacionada',
+    participacionNota: 'Estructura vecina: no forma parte de la superficie articular radiocarpiana.',
+    ubicacion: 'Sobre la cara palmar del piramidal, en la base de la eminencia hipotenar.',
+    descripcion: 'Hueso sesamoideo pequeño y redondeado, incluido en el tendón del flexor ulnar del carpo. Articula únicamente con el piramidal.',
+    funcion: 'Aumenta el brazo de palanca del flexor ulnar del carpo y sirve de punto de anclaje a los ligamentos pisoganchoso y pisometacarpiano.',
+    relaciones: 'Medial al canal de Guyon: la arteria y el nervio ulnares pasan lateral a él. Dorsal: piramidal.',
+    clinica: 'Palpable en la cara palmar-medial de la muñeca; fracturas o artrosis pisopiramidal dan dolor ulnar palmar. Referencia para localizar el nervio ulnar.',
+    pista: 'Pequeño hueso redondo palpable en la base del lado medial de la palma.',
+    enEsquema: true,
   },
-  lculnar: {
-    id: 'lculnar', nombre: 'Ligamento colateral ulnar del carpo', tipo: 'Ligamento',
-    ubicacion: 'Borde medial de la articulación.',
-    morfologia: 'Banda del proceso estiloides de la ulna al piramidal y pisiforme.',
-    relaciones: 'Cercano al tendón del extensor ulnar del carpo y al CFCT.',
-    inserciones: 'Proceso estiloides de la ulna; piramidal y pisiforme.',
-    funcion: 'Estabilidad medial.',
-    biomecanica: 'Limita la desviación radial excesiva.',
-    clinica: 'Forma parte del complejo fibrocartilaginoso triangular.'
-  },
-  lulnocarpiano: {
-    id: 'lulnocarpiano', nombre: 'Ligamento ulnocarpiano palmar', tipo: 'Ligamento',
-    ubicacion: 'Cara palmar, lado ulnar.',
-    morfologia: 'Fibras del disco articular/CFCT y proceso estiloides de la ulna hacia semilunar, piramidal y hueso grande.',
-    relaciones: 'Relacionado con el disco articular y la cápsula anterior.',
-    inserciones: 'Disco articular y ulna distal; semilunar y piramidal.',
-    funcion: 'Conecta la ulna distal con el carpo, estabilizando medialmente.',
-    biomecanica: 'Transmite fuerzas ulnares de la ulna al carpo.',
-    clinica: 'Su lesión forma parte de la inestabilidad ulnar del carpo.'
-  },
-  lrudistal: {
-    id: 'lrudistal', nombre: 'Ligamentos radioulnares distales', tipo: 'Ligamento',
-    ubicacion: 'Entre la escotadura ulnar del radio y la cabeza de la ulna (palmar y dorsal).',
-    morfologia: 'Bandas anterior y posterior que bordean el disco articular.',
-    relaciones: 'Forman los bordes del CFCT.',
-    inserciones: 'Radio (escotadura ulnar) y ulna (cabeza/estiloides).',
-    funcion: 'Estabilizan la articulación radioulnar distal.',
-    biomecanica: 'Limitan la traslación palmar-dorsal de la cabeza ulnar durante la pronosupinación.',
-    clinica: 'Su rotura causa inestabilidad radioulnar distal.'
-  },
-  membrana: {
-    id: 'membrana', nombre: 'Membrana interósea del antebrazo', tipo: 'Ligamento',
-    ubicacion: 'Entre los bordes interóseos del radio y la ulna.',
-    morfologia: 'Lámina fibrosa con fibras oblicuas.',
-    relaciones: 'Superficie para origen de músculos profundos del antebrazo.',
-    inserciones: 'Bordes interóseos de radio y ulna.',
-    funcion: 'Une ambos huesos y transmite carga del radio a la ulna.',
-    biomecanica: 'Distribuye fuerzas proximalmente.',
-    clinica: 'Importante en la estabilidad longitudinal del antebrazo.'
-  },
-  lintercarpiano: {
-    id: 'lintercarpiano', nombre: 'Ligamento intercarpiano dorsal', tipo: 'Ligamento',
-    ubicacion: 'Cara dorsal del carpo.',
-    morfologia: 'Bandas transversales que unen piramidal con escafoides y hueso grande.',
-    relaciones: 'Superficial a los ligamentos interóseos.',
-    inserciones: 'Piramidal, escafoides, trapecio, trapezoide y hueso grande.',
-    funcion: 'Estabiliza el carpo entre filas.',
-    biomecanica: 'Coordina el movimiento de las hileras.',
-    clinica: 'Lesionado en inestabilidades carpianas.'
-  },
-  escapira: {
-    id: 'escapira', nombre: 'Ligamentos intercarpianos dorsales (escafopiramidal, trapezoescafoideo)', tipo: 'Ligamento',
-    ubicacion: 'Dorso del carpo (escafopiramidal, trapezoescafoideo, trapeziopiramidal).',
-    morfologia: 'Haces dorsales que unen huesos de ambas hileras.',
-    relaciones: 'Cercano a tendones extensores.',
-    inserciones: 'Entre escafoides, trapecio, trapezoide y piramidal, según la denominación de cada haz en la figura.',
-    funcion: 'Estabilizadores intercarpianos.',
-    biomecanica: 'Controlan la mediocarpiana.',
-    clinica: 'Importantes para la estabilidad carpiana.'
-  }
-}
-
-export interface Hotspot { id: string; x: number; y: number; label: string }
-export interface View { n: number; titulo: string; hotspots: Hotspot[] }
-
-// Coordenadas en % del ancho/alto de la imagen original (colocadas sobre las
-// estructuras señaladas en los rótulos de cada figura).
-export const LAB_VIEWS: View[] = [
-  { n: 14, titulo: 'Corte coronal', hotspots: [
-    { id: 'ulna', x: 38, y: 10, label: 'Ulna' }, { id: 'radio', x: 57, y: 13, label: 'Radio' },
-    { id: 'disco', x: 38, y: 29, label: 'Disco articular' }, { id: 'escafoides', x: 58, y: 45, label: 'Escafoides' },
-    { id: 'piramidal', x: 33, y: 45, label: 'Piramidal' }, { id: 'trapecio', x: 64, y: 56, label: 'Trapecio' } ] },
-  { n: 19, titulo: 'Ligamentos palmares', hotspots: [
-    { id: 'radio', x: 45, y: 17, label: 'Radio' }, { id: 'ulna', x: 62, y: 17, label: 'Ulna' },
-    { id: 'membrana', x: 58, y: 22, label: 'Membrana interósea' }, { id: 'lrudistal', x: 56, y: 32, label: 'Lig. radioulnar distal anterior' },
-    { id: 'lrcpalmar', x: 45, y: 44, label: 'Lig. radiocarpiano palmar' }, { id: 'lulnocarpiano', x: 60, y: 41, label: 'Lig. ulnocarpiano palmar' },
-    { id: 'lcradial', x: 40, y: 49, label: 'Lig. colateral radial' }, { id: 'lculnar', x: 62, y: 47, label: 'Lig. colateral ulnar' },
-    { id: 'piramidal', x: 59, y: 53, label: 'Piramidal' }, { id: 'trapecio', x: 40, y: 56, label: 'Trapecio' } ] },
-  { n: 20, titulo: 'Ligamentos dorsales', hotspots: [
-    { id: 'ulna', x: 39, y: 15, label: 'Ulna' }, { id: 'radio', x: 50, y: 16, label: 'Radio' },
-    { id: 'membrana', x: 39, y: 22, label: 'Membrana interósea' }, { id: 'lrudistal', x: 39, y: 36, label: 'Lig. radioulnar distal posterior' },
-    { id: 'lculnar', x: 38, y: 41, label: 'Lig. colateral ulnar' }, { id: 'lrcdorsal', x: 46, y: 44, label: 'Lig. radiocarpiano dorsal' },
-    { id: 'lintercarpiano', x: 40, y: 48, label: 'Lig. intercarpiano dorsal' }, { id: 'lcradial', x: 56, y: 43, label: 'Lig. colateral radial' },
-    { id: 'escapira', x: 56, y: 48, label: 'Lig. escafopiramidal' }, { id: 'piramidal', x: 38, y: 56, label: 'Piramidal' },
-    { id: 'ganchoso', x: 38, y: 61, label: 'Ganchoso' } ] },
-  { n: 58, titulo: 'Radiografía', hotspots: [
-    { id: 'radio', x: 27, y: 8, label: 'Radio' }, { id: 'ulna', x: 11, y: 19, label: 'Ulna' },
-    { id: 'semilunar', x: 18, y: 34, label: 'Semilunar' }, { id: 'escafoides', x: 30, y: 40, label: 'Escafoides' },
-    { id: 'pisiforme', x: 14, y: 42, label: 'Pisiforme' }, { id: 'piramidal', x: 14, y: 52, label: 'Piramidal' },
-    { id: 'trapecio', x: 36, y: 54, label: 'Trapecio' }, { id: 'ganchoso', x: 18, y: 61, label: 'Ganchoso' },
-    { id: 'grande', x: 22, y: 60, label: 'Hueso grande' } ] },
-  { n: 8, titulo: 'Huesos carpianos', hotspots: [
-    { id: 'semilunar', x: 55, y: 23, label: 'Semilunar' }, { id: 'escafoides', x: 41, y: 30, label: 'Escafoides' },
-    { id: 'piramidal', x: 65, y: 35, label: 'Piramidal' }, { id: 'pisiforme', x: 76, y: 50, label: 'Pisiforme' },
-    { id: 'grande', x: 52, y: 54, label: 'Hueso grande' }, { id: 'trapecio', x: 26, y: 54, label: 'Trapecio' },
-    { id: 'trapezoide', x: 40, y: 67, label: 'Trapezoide' }, { id: 'ganchoso', x: 67, y: 68, label: 'Ganchoso' } ] }
 ]
 
-export const MESH_IDS = ['radio','ulna','disco','escafoides','semilunar','piramidal','pisiforme','trapecio','trapezoide','grande','ganchoso']
+export const STRUCTURE_BY_ID: Record<string, Structure> = Object.fromEntries(STRUCTURES.map((s) => [s.id, s]))
+
+/** Textos de las superficies articulares (sección 7.2 del atlas). */
+export const SURFACES = {
+  proximal: {
+    titulo: 'Superficie proximal o antebraquial',
+    texto: 'Formada por la cara articular carpiana del radio distal (fositas escafoidea y semilunar) y por la superficie distal del disco articular. Es una superficie cóncava en ambos ejes.',
+  },
+  distal: {
+    titulo: 'Superficie distal o carpiana',
+    texto: 'Integrada por las superficies proximales convexas del escafoides, el semilunar y el piramidal, unidas entre sí por los ligamentos interóseos escafolunar y lunopiramidal, de modo que actúan como un solo cóndilo.',
+  },
+  nota: 'El contacto de cada hueso con la superficie proximal varía con la posición de la muñeca: en neutro el escafoides y el semilunar contactan con el radio, mientras que el piramidal se relaciona con el disco, sobre todo en desviación ulnar.',
+  ulna: 'La ulna NO contacta directamente con los huesos del carpo en la articulación radiocarpiana normal: el disco articular se interpone entre ambos.',
+}

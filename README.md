@@ -1,14 +1,36 @@
-# Museo Anatómico Interactivo — Articulación radiocarpiana
-PUCE Sede Santo Domingo · Medicina · Morfofunción Osteomuscular.
+# RADIOCARPAL LAB
+Laboratorio virtual de anatomía, biomecánica y correlación clínica de la muñeca.
+PUCE Sede Santo Domingo · Medicina · Morfofunción Osteomuscular (4.º semestre).
 
-**Repositorio privado**: las ilustraciones (`public/images`) están protegidas por derechos de autor.
+Aplicación web estática (React + TypeScript + Vite + Tailwind + Three.js/React Three Fiber) pensada para abrirse desde un QR en la infografía física.
 
-## Ver en el celular
-**Opción rápida (misma red Wi-Fi):** `npm i && npm run dev` y abrir en el celular la dirección `Network` que muestra Vite (puerto 5173).
+## Módulos
+1 Inicio · 2 Atlas anatómico (zonas seleccionables, modo estudio/autoevaluación) · 3 Explorador 3D (modelo geométrico simplificado) · 4 Ligamentos y estabilidad · 5 Miología y biomecánica (simulador) · 6 Vascularización e inervación · 7 Casos clínicos (3) · 8 Autoevaluación (20 preguntas) y bibliografía APA.
 
-**Publicar (recomendado, funciona con repos privados):** importar el repositorio en Vercel, Netlify o Cloudflare Pages
-con *Build command* `npm run build` y *Output directory* `dist`. Mantén el acceso restringido (protección por contraseña/Vercel Authentication) por los derechos de las imágenes.
+## Ejecutar
+```bash
+npm install
+npm run dev          # desarrollo (http://localhost:5173)
+npm run build        # comprobación de tipos + compilación en dist/
+npm run preview      # sirve dist/
+npm test             # pruebas unitarias y de componentes (Vitest)
+npm run test:e2e     # E2E en Chromium (requiere build previo y Playwright)
+```
 
-**GitHub Pages:** `.github/workflows/pages.yml` publica `dist`; en repos privados Pages exige un plan de pago. Activar en Settings → Pages → Source: GitHub Actions y ejecutar el flujo desde la rama que prefieras (el flujo se activa con `main`).
+## Publicar (necesita tu cuenta)
+- **Vercel**: importa el repositorio → *Framework* Vite, *Build* `npm run build`, *Output* `dist` (ya definido en `vercel.json`).
+- **Netlify**: ya incluye `netlify.toml`.
+- **GitHub Pages**: `.github/workflows/pages.yml` (en repositorios privados Pages requiere plan de pago).
+Tras publicar, para la vista previa al compartir (Open Graph) cambia en `index.html` la ruta de `og:image` por la URL absoluta de `og-image.png`.
 
-Ver `PROGRESO.md` para alcance y limitaciones.
+## Código QR (solo con la URL pública ya publicada)
+```bash
+npm run qr -- https://TU-URL-PUBLICA/
+```
+El script comprueba que la URL responde y es RADIOCARPAL LAB, genera el QR (negro sobre blanco, margen de seguridad), verifica que decodifica exactamente a esa URL y escribe en `qr/`: `radiocarpal-lab-qr.png` (2048 px), `radiocarpal-lab-qr.svg`, `tarjeta-qr.svg` y `tarjeta-qr.png` (tarjeta para la infografía).
+
+## Alcance y limitaciones (declaradas)
+- Las ilustraciones son **dibujos originales** (SVG); no se incluyen imágenes de libros. Las láminas escaneadas del proyecto anterior se movieron a `archivo-previo/` (no se publican).
+- El modelo 3D es **geométrico y simplificado** (elipsoides/cilindros), no una malla validada. No se incluye enlace a visores externos porque no pudieron verificarse.
+- El texto se redactó con conocimiento anatómico establecido; **no se citan páginas** y las obras no se consultaron página a página para esta versión. El docente debe contrastarlo; verificar también editorial/año de la bibliografía.
+- Ángulos y porcentajes (rangos, irrigación del escafoides, parámetros radiográficos) son orientativos.

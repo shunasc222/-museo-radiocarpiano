@@ -1,25 +1,31 @@
-import { useEffect, useState } from 'react'
-import Home from './components/Home'
-import Lab from './components/Lab'
-import ModulePage from './components/ModulePage'
-import { MODULES } from './data/modules'
+import { lazy, Suspense } from 'react'
+import { Shell } from './components/layout/Shell'
+import { ToastProvider } from './components/ui/ui'
+import { useRoute } from './lib/nav'
+import Home from './sections/Home'
+import Atlas from './sections/Atlas'
+import Ligaments from './sections/Ligaments'
+import Myology from './sections/Myology'
+import Neurovascular from './sections/Neurovascular'
+import Cases from './sections/Cases'
+import Assessment from './sections/Assessment'
+
+const Explorer3D = lazy(() => import('./sections/Explorer3D'))
 
 export default function App() {
-  const [h, setH] = useState(location.hash || '#inicio')
-  const [menu, setMenu] = useState(false)
-  useEffect(() => { const f = () => { setH(location.hash || '#inicio'); setMenu(false); if (!location.hash.startsWith('#modulos')) window.scrollTo(0, 0) }; addEventListener('hashchange', f); return () => removeEventListener('hashchange', f) }, [])
-  const mod = h.startsWith('#m-') ? h.slice(3) : null
+  const { section, go, visited } = useRoute()
   return (
-    <>
-      <header className="nav">
-        <a href="#inicio" className="brand">Museo Anatómico <em>Radiocarpiano</em></a>
-        <button className="burger" onClick={() => setMenu(!menu)} aria-label="Menú">☰</button>
-        <nav className={menu ? 'open' : ''}>
-          <a href="#lab" className={h === '#lab' ? 'on' : ''}>Laboratorio 2D+3D</a>
-          {MODULES.map(m => <a key={m.id} href={`#m-${m.id}`} className={mod === m.id ? 'on' : ''}>{m.n}. {m.titulo}</a>)}
-        </nav>
-      </header>
-      {h === '#lab' ? <Lab /> : mod && MODULES.some(m => m.id === mod) ? <ModulePage key={mod} id={mod} /> : <Home />}
-    </>
+    <ToastProvider>
+      <Shell section={section} go={go} visited={visited}>
+        {section === 'inicio' && <Home go={go} />}
+        {section === 'atlas' && <Atlas />}
+        {section === 'explorador-3d' && <Suspense fallback={<p role="status" className="p-8 text-center text-ink-soft">Cargando explorador 3D…</p>}><Explorer3D go={go} /></Suspense>}
+        {section === 'ligamentos' && <Ligaments />}
+        {section === 'miologia' && <Myology />}
+        {section === 'neurovascular' && <Neurovascular />}
+        {section === 'casos' && <Cases go={go} />}
+        {section === 'evaluacion' && <Assessment />}
+      </Shell>
+    </ToastProvider>
   )
 }

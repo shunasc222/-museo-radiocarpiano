@@ -1,5 +1,6 @@
 import { MODULES } from '../data/modules'
 import { byN, imgUrl, SRC_NAME } from '../data/images'
+import { ESTACIONES } from './Estaciones'
 
 export default function Home() {
   const fig = byN(26)
@@ -15,9 +16,14 @@ export default function Home() {
           <h1>Articulación<br /><em>radiocarpiana</em></h1>
           <p className="kicker">Museo anatómico interactivo</p>
           <p className="lead">Atlas auténtico, recreación tridimensional y fichas de estudio de la muñeca. Carrera de Medicina · Morfofunción Osteomuscular.</p>
-          <div className="cta"><a className="btn gold" href="#lab">Iniciar exploración</a><a className="btn ghost" href="#modulos">Explorar módulos</a></div>
-          <p className="facts"><span><b>10</b> módulos</span><span><b>64</b> láminas</span><span><b>2D + 3D</b> sincronizados</span></p>
+          <div className="cta"><a className="btn gold" href="#estacion-1">Iniciar exploración</a><a className="btn ghost" href="#modulos">Explorar módulos</a></div>
+          <p className="facts"><span><b>4</b> estaciones</span><span><b>10</b> módulos</span><span><b>64</b> láminas</span><span><b>2D + 3D</b> sincronizados</span></p>
         </div>
+      </section>
+      <section id="estaciones" className="modsec stsec">
+        <div className="modhead"><p className="eyebrow">Laboratorio de práctica</p><h2 className="big">Cuatro estaciones <em>en secuencia</em></h2></div>
+        <ol className="modlist stlist">{ESTACIONES.map(s => (
+          <li key={s.id}><a href={'#' + s.id}><span className="num">{s.n}</span><b>{s.titulo}</b><small>{s.desc}</small><i aria-hidden>→</i></a></li>))}</ol>
       </section>
       <section id="modulos" className="modsec">
         <div className="modhead"><p className="eyebrow">Recorrido</p><h2 className="big">Diez módulos <em>de estudio</em></h2></div>

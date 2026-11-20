@@ -60,6 +60,7 @@ export default function Lab() {
   const reset = () => { setView('palmar'); setNonce(x => x + 1); setFrame('muneca'); setExplode(0); setMotion('neutro'); setSel(null); setLayers(DEFAULT_LAYERS); setShowHand(true); setMode('closed') }
   const mo = MOTION[motion], rcDeg = Math.round(mo.total * mo.rc), mcDeg = mo.total - rcDeg
   const nActive = LAYERS.filter(l => layers[l.id].on).length
+  useEffect(() => { try { const id = sessionStorage.getItem('museo-pick'); if (id && STRUCTURES[id]) { sessionStorage.removeItem('museo-pick'); setTimeout(() => pick(id), 300) } } catch { /* sin almacenamiento */ } }, [])
   const goto = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   const toLayers = () => { setLopen(o => !o); if (mobile) setMode('closed') }
   const toInfo = () => { if (mobile) { if (sel) { setLopen(false); setMode('full') } else goto('lab-3d') } else goto('lab-info') }
@@ -84,7 +85,7 @@ export default function Lab() {
         <button className={here === 'atlas' && !lopen ? 'on' : ''} onClick={() => goto('lab-atlas')}>Atlas 2D</button>
         <button className={here === '3d' && !lopen ? 'on' : ''} onClick={() => goto('lab-3d')}>Modelo 3D</button>
         <button className={lopen ? 'on' : ''} onClick={() => { goto('lab-3d'); setLopen(true); if (mobile) setMode('closed') }}>Capas{nActive > 1 ? <i>{nActive}</i> : null}</button>
-        <button className={mode === 'full' ? 'on' : ''} onClick={toInfo}>Información</button>
+        <button className={mode === 'full' ? 'on' : ''} onClick={toInfo}>Ficha</button>
       </nav>
       <div className="labgrid">
         <section className="pane atlas" id="lab-atlas">
